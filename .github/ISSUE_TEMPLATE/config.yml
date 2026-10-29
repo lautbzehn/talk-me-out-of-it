@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security issue privately
+    url: https://github.com/lautbzehn/talk-me-out-of-it/blob/main/SECURITY.md
+    about: Please do not open a public issue for security problems.
+  - name: Watch a council debate
+    url: https://talk.icarianforge.com
+    about: The fastest way to see what Talk Me Out of It does.

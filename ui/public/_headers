@@ -1,0 +1,25 @@
+# Security headers, sent with every file. Cloudflare reads this file from the published folder
+# (it is copied into dist/ from here). They match what the Navigator and The Unlisted send.
+#
+# The content policy lets pages run only this site's own files: its script, its stylesheet, its
+# self-hosted fonts and its images, plus one exception: Cloudflare Web Analytics, the beacon
+# Cloudflare adds to every page (anonymous visit counts, no cookies, as on the other Icarian Forge
+# sites; allowed by Dan 10.29.2026). Nothing else loads from another site, and nothing may embed
+# this one in a frame. blob: images are for the share card. If a new feature needs something
+# else, widen this on purpose rather than by accident.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), payment=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+
+# Caching. Everything the build puts under /assets/ has a hash of its contents in its name
+# (index-<hash>.js), so a file never changes under its name and a browser may keep it for a year.
+# Without this rule the Worker answers "max-age=0, must-revalidate", and every returning visitor
+# asks the server about each of the script, the stylesheet and the fonts only to be told "not
+# modified". The pages, the gallery files and the preview images are not hashed, so they keep the
+# default and are always checked.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

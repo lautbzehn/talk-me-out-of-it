@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#121113" />
+    <title>Talk Me Out of It</title>
+    <meta name="description" content="A council of AI agents argues about the gadget you want, then rules: Buy, Wait 30 days, or Skip. Watch real debates play back." />
+    <!-- The gallery list is the first thing the app asks for. Starting it here, with the page, saves the
+         wait for the script to download and run first. "crossorigin" makes it match the app's fetch(). -->
+    <link rel="preload" href="/gallery/index.json" as="fetch" crossorigin="anonymous" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>This page needs JavaScript to replay the council's debate.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

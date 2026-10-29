@@ -1,0 +1,53 @@
+{
+  "schema_version": 3,
+  "kind": "declined",
+  "created_at": "2026-10-29T05:36:06+00:00",
+  "model": "qwen2.5:14b",
+  "purchase": {
+    "item": "Leather sofa",
+    "price": 1200.0,
+    "why": "My old couch sags in the middle.",
+    "want_level": 6,
+    "current_device": null
+  },
+  "intake": {
+    "note": "The item is a leather sofa.",
+    "why_has_instructions": false,
+    "is_tech_gadget": false,
+    "category": null,
+    "ok": true,
+    "error": null,
+    "attempts": [
+      {
+        "attempt": 1,
+        "seconds": 4.69,
+        "prompt_tokens": 346,
+        "output_tokens": 33,
+        "cut_off": false,
+        "raw": "{\"note\": \"The item is a leather sofa.\", \"why_has_instructions\": false, \"is_tech_gadget\": false, \"category\": null}",
+        "ok": true,
+        "error": null
+      }
+    ],
+    "seconds": 4.69
+  },
+  "guard": {
+    "triggered": false,
+    "by": [],
+    "removed": [],
+    "why_as_read": "My old couch sags in the middle."
+  },
+  "message": "The council only weighs in on tech gadgets, like consoles, headphones, phones, cameras and laptops, and \"Leather sofa\" doesn't look like one. Try it with a gadget you're thinking about buying.",
+  "rounds": [],
+  "scoring": null,
+  "judge": null,
+  "timing": {
+    "total_seconds": 4.69,
+    "intake_seconds": 4.69,
+    "per_round": [],
+    "judge_seconds": 0
+  },
+  "gallery": {
+    "why_featured": "Not a gadget, so the council politely declines instead of debating it."
+  }
+}

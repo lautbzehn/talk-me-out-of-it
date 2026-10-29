@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-label="Talk Me Out of It: a council of AI agents argues about the gadget you want, then rules: Buy, Wait 30 days, or Skip.">
+<defs>
+  <radialGradient id="g1" cx="0.1" cy="0.05" r="0.7"><stop offset="0" stop-color="#a78bfa" stop-opacity="0.22"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g2" cx="0.92" cy="0.1" r="0.6"><stop offset="0" stop-color="#5fb3b3" stop-opacity="0.18"/><stop offset="1" stop-color="#5fb3b3" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g3" cx="0.5" cy="1.1" r="0.6"><stop offset="0" stop-color="#e78a53" stop-opacity="0.16"/><stop offset="1" stop-color="#e78a53" stop-opacity="0"/></radialGradient>
+  <pattern id="p" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1"/></pattern>
+  <filter id="glow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 0.9  0 0.55 0 0 0.25  0 0 0.2 0 0  0 0 0 0.55 0" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<style>
+  .orb { animation: rise 5.2s ease-in-out infinite; }
+  .o2 { animation-delay: 0.6s; } .o3 { animation-delay: 1.2s; } .o4 { animation-delay: 1.8s; } .o5 { animation-delay: 2.4s; }
+  @keyframes rise { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+</style>
+<rect width="1280" height="420" rx="24" fill="#121113"/>
+<rect width="1280" height="420" rx="24" fill="url(#p)"/>
+<rect width="1280" height="420" rx="24" fill="url(#g1)"/>
+<rect width="1280" height="420" rx="24" fill="url(#g2)"/>
+<rect width="1280" height="420" rx="24" fill="url(#g3)"/>
+<rect x="0.5" y="0.5" width="1279" height="419" rx="23.5" fill="none" stroke="rgba(255,255,255,0.09)"/>
+<g transform="translate(64 58)">
+  <g class="orb"><circle cx="12" cy="14" r="11" fill="#5fb3b3"/><circle cx="8.5" cy="9.5" r="3.5" fill="#ffffff" opacity="0.7"/></g>
+  <g class="orb o2"><circle cx="30" cy="14" r="11" fill="#a78bfa"/><circle cx="26.5" cy="9.5" r="3.5" fill="#ffffff" opacity="0.7"/></g>
+  <g class="orb o3"><circle cx="48" cy="14" r="11" fill="#f472b6"/><circle cx="44.5" cy="9.5" r="3.5" fill="#ffffff" opacity="0.7"/></g>
+  <g class="orb o4"><circle cx="66" cy="14" r="11" fill="#60a5fa"/><circle cx="62.5" cy="9.5" r="3.5" fill="#ffffff" opacity="0.7"/></g>
+  <g class="orb o5"><circle cx="84" cy="14" r="11" fill="#e7dfd6"/><circle cx="80.5" cy="9.5" r="3.5" fill="#ffffff" opacity="0.8"/></g>
+  <text x="110" y="19" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="15" letter-spacing="2.4" fill="#a39d95">AN ICARIAN FORGE PRODUCT · LIVE</text>
+</g>
+<text x="64" y="172" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="60" font-weight="700" letter-spacing="-1.2" fill="#f2efea" filter="url(#glow)">Talk Me Out of It</text>
+<text x="66" y="220" font-family="Inter, ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="25" font-weight="400" fill="#a39d95">A council of AI agents argues about the gadget you want, then rules: <tspan fill="#4ade80" font-weight="600">Buy</tspan>, <tspan fill="#fbbf24" font-weight="600">Wait 30 days</tspan>, or <tspan fill="#f87171" font-weight="600">Skip</tspan>.</text>
+<g font-family="Inter, ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15.5" font-weight="500">
+  <rect x="64" y="284" width="148" height="44" rx="22" fill="rgba(95,179,179,0.12)" stroke="#5fb3b3"/><text x="138" y="312" text-anchor="middle" fill="#f2efea">The Analyst</text>
+  <rect x="226" y="284" width="138" height="44" rx="22" fill="rgba(167,139,250,0.12)" stroke="#a78bfa"/><text x="295" y="312" text-anchor="middle" fill="#f2efea">Future You</text>
+  <rect x="378" y="284" width="176" height="44" rx="22" fill="rgba(244,114,182,0.12)" stroke="#f472b6"/><text x="466" y="312" text-anchor="middle" fill="#f2efea">Budget Guardian</text>
+  <rect x="568" y="284" width="196" height="44" rx="22" fill="rgba(96,165,250,0.12)" stroke="#60a5fa"/><text x="666" y="312" text-anchor="middle" fill="#f2efea">Alternatives Hunter</text>
+  <path d="M784 300 L790 306 L784 312 L778 306 Z" fill="none" stroke="#6f6a64" stroke-width="1.6"/>
+  <rect x="804" y="284" width="130" height="44" rx="22" fill="rgba(231,223,214,0.10)" stroke="#e7dfd6" stroke-width="1.4"/><text x="869" y="312" text-anchor="middle" fill="#f2efea" font-weight="600">The Judge</text>
+  <path d="M954 300 L960 306 L954 312 L948 306 Z" fill="none" stroke="#6f6a64" stroke-width="1.6"/>
+  <rect x="974" y="284" width="242" height="44" rx="22" fill="rgba(231,138,83,0.14)" stroke="#e78a53" stroke-width="1.6"/><text x="1095" y="312" text-anchor="middle" fill="#f2efea" font-weight="600">The code calculates</text>
+</g>
+<text x="64" y="386" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="1.6" fill="#6f6a64">TALK.ICARIANFORGE.COM  ·  FREE LOCAL MODEL  ·  NO FRAMEWORK  ·  THE MODEL JUDGES, THE CODE CALCULATES</text>
+</svg>

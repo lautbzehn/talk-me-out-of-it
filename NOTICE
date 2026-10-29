@@ -1,0 +1,28 @@
+Talk Me Out of It uses third-party work under its own terms:
+
+- Fonts: Geist and Geist Mono, SIL Open Font License 1.1, self-hosted from the
+  @fontsource-variable/geist and @fontsource-variable/geist-mono packages.
+  https://openfontlicense.org
+- The model: Qwen2.5 14B by Alibaba Cloud (Apache License 2.0), run locally
+  through Ollama (MIT). The saved debates in sessions/gallery/ are its output.
+  The model itself is not part of this repository.
+- Libraries bundled into the site: React and React DOM (MIT), Motion (MIT),
+  Lucide (ISC), clsx (MIT), and Tailwind CSS (MIT), which produces the
+  stylesheet. Build and deploy tools, none of which reach
+  visitors: Vite (MIT), TypeScript (Apache-2.0), and Wrangler (MIT or
+  Apache-2.0).
+- The engine: the Ollama Python client (MIT) and Pydantic (MIT).
+- Design: the look of the site adapts ideas from components published on
+  21st.dev, rewritten against this project's own colors and type. Three carry
+  an MIT license, and the license notices they came with are kept in the
+  files in ui/pulled/: Tweenly Chart KPI (mirukullacode), Klyv Shimmer Button
+  (Klyv contributors), and Feature Grid Spotlight Cards (Mohammad Shehadeh,
+  from Hirael). Seven others arrived with no license text: Illuminated Hero
+  (efferd), Chat Messages (nexus-ui), Typing Indicator (ddoemonn), Chat Bubble
+  Reactions (bundui), User Presence Avatar (adrielzimbril), LiquidAurora
+  (dhileepkumargm), and Agent Trace (n1m4mz). So did the three themes
+  considered, and the Darkmatter theme (serafimcloud) whose color values the
+  site's tokens adapt. Those files were reviewed and are not in this
+  repository; ui/pulled/REVIEW.md records what each one was and what the review
+  found. If you are an author and want a credit changed or removed, write to
+  hello@icarianforge.com.

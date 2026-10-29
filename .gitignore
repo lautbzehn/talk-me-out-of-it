@@ -1,0 +1,52 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Secrets and local config (never commit these)
+.env
+.env.*
+*.key
+*.pem
+.claude/settings.local.json
+
+# Cloudflare local state and variables (wrangler writes these where it is run, so cover the root too)
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# UI build output and packages (phase 7)
+node_modules/
+ui/dist/
+
+# Scratch sessions that aren't curated for the gallery
+sessions/scratch/
+
+# Eval run sessions (the reports next to them are small and worth keeping)
+evals/runs/*/sessions/
+
+# Branch checkouts made by `git worktree add`
+.claude/worktrees/
+
+# 21st.dev components and themes that arrived with no license text. Reviewed and adapted, never
+# published here: see NOTICE and ui/pulled/REVIEW.md. Only the three MIT components stay in git.
+ui/pulled/agent-trace/
+ui/pulled/chat-bubble-reactions/
+ui/pulled/chat-messages/
+ui/pulled/illuminated-hero/
+ui/pulled/liquid-aurora/
+ui/pulled/typing-indicator/
+ui/pulled/user-presence-avatar/
+ui/pulled/themes/

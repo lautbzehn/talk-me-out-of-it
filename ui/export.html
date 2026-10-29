@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- Dev tool, not part of the site. `npm run build` only builds index.html, so this page is never
+     deployed. Run `npm run dev`, open /export.html, press the button: it draws the home card and
+     one card per gallery session and saves them to public/previews/, where the build step finds
+     them. Redo it whenever the gallery changes. -->
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Export preview images</title>
+  </head>
+  <body>
+    <main id="app" style="max-width: 40rem; margin: 3rem auto; padding: 0 1rem; font-family: var(--font-mono)"></main>
+    <script type="module" src="/src/export-previews.ts"></script>
+  </body>
+</html>

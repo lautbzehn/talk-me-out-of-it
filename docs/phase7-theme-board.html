@@ -1,0 +1,309 @@
+<title>Theme Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@400;700&family=Fira+Code:wght@400;600&family=Poppins:wght@400;600&family=Playfair+Display:wght@500&display=swap">
+<style>
+  /* Layout: a board of three dark columns, one per 21st.dev theme, each styled only by that
+     theme's own tokens and fonts, around the same sample card, two bubbles and a button.
+     Single dark look on purpose: every candidate is a dark theme. */
+  :root {
+    color-scheme: dark;
+    --page-bg: #0b0b0c;
+    --page-fg: #d8d6d3;
+    --page-strong: #f4f1ec;
+    --page-muted: #8c8a87;
+    --page-border: #27262a;
+    --page-panel: #141316;
+    --page-accent: #9ec5c5;
+    --buy: #4ade80;
+    --wait: #fbbf24;
+    --skip: #f87171;
+    --analyst: #5fb3b3;
+    --future: #a78bfa;
+    --guardian: #f472b6;
+    --font-page: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  body {
+    background: var(--page-bg);
+    color: var(--page-fg);
+    font-family: var(--font-page);
+    font-size: 15px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 96px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+  h1 { margin: 0; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.01em; color: var(--page-strong); text-wrap: balance; }
+  .lede { margin: 0; max-width: 62ch; color: var(--page-muted); }
+  .lede b { color: var(--page-fg); font-weight: 500; }
+  .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+
+  /* A column takes the theme's tokens as published. */
+  .theme {
+    min-width: 0;
+    display: flex; flex-direction: column; gap: 16px;
+    padding: 18px;
+    background: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 6px);
+    font-family: var(--font-sans);
+    letter-spacing: var(--letter-spacing, 0);
+    box-shadow: var(--shadow-offset-x, 0) var(--shadow-offset-y, 0) var(--shadow-blur, 0) var(--shadow-spread, 0)
+      color-mix(in oklab, var(--shadow-color, #000) calc(var(--shadow-opacity, 0) * 100%), transparent);
+    transition: outline-color 150ms;
+    outline: 2px solid transparent; outline-offset: 3px;
+  }
+  .theme[data-chosen="true"] { outline-color: var(--page-accent); }
+
+  .t-darkmatter {
+    --background: #121113; --foreground: #c1c1c1; --card: #121212; --card-foreground: #c1c1c1;
+    --muted: #222222; --muted-foreground: #888888; --accent: #333333; --primary: #e78a53;
+    --primary-foreground: #121113; --secondary: #5f8787; --border: #222222; --radius: 0.75rem;
+    --font-sans: "Geist Mono", ui-monospace, monospace; --font-mono: "JetBrains Mono", monospace;
+    --shadow-color: #000000; --shadow-opacity: 0.05; --shadow-blur: 4px; --shadow-offset-y: 1px;
+  }
+  .t-violet {
+    --background: #050505; --foreground: #00ff9f; --card: #0d0d0d; --card-foreground: #ffffff;
+    --muted: #1a1a1a; --muted-foreground: #777777; --accent: #ff0055; --primary: #bc13fe;
+    --primary-foreground: #ffffff; --secondary: #00b8ff; --border: #333333; --radius: 0rem;
+    --font-sans: "Orbitron", sans-serif; --font-mono: "Fira Code", monospace; --letter-spacing: 0.15em;
+    --shadow-color: #ff0055; --shadow-opacity: 0.8; --shadow-blur: 20px; --shadow-spread: 4px;
+  }
+  .t-slate {
+    --background: hsl(0 0% 10%); --foreground: hsl(0 0% 98%); --card: hsl(0 0% 12%); --card-foreground: hsl(0 0% 98%);
+    --muted: hsl(0 0% 15%); --muted-foreground: hsl(0 0% 65%); --accent: hsl(345 100% 20%); --primary: hsl(345 100% 45%);
+    --primary-foreground: #ffffff; --secondary: hsl(0 0% 20%); --border: hsl(0 0% 20%); --radius: 4px;
+    --font-sans: "Poppins", sans-serif; --font-mono: "JetBrains Mono", monospace; --letter-spacing: 0.025em;
+    --shadow-color: #000; --shadow-opacity: 0.5; --shadow-blur: 25px; --shadow-offset-y: 10px;
+  }
+
+  .theme-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .theme-name { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--card-foreground); }
+  .theme-by { font-size: 0.78rem; color: var(--muted-foreground); }
+  .theme-by a { color: inherit; }
+
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .sw { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .sw i { display: block; height: 26px; border-radius: 6px; border: 1px solid var(--border); }
+  .sw span { font-size: 0.62rem; letter-spacing: 0.02em; color: var(--muted-foreground); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* The sample verdict card, the same markup our React card uses. */
+  .card {
+    display: flex; flex-direction: column; gap: 14px;
+    background: var(--card); color: var(--card-foreground);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+  }
+  .eyebrow { margin: 0; font-size: 0.66rem; font-weight: 600; text-transform: uppercase; letter-spacing: max(0.08em, var(--letter-spacing, 0)); color: var(--muted-foreground); }
+  .item { margin: 0; font-size: 1.15rem; line-height: 1.25; font-weight: 600; text-wrap: balance; }
+  .facts { margin: 0; font-size: 0.82rem; color: var(--muted-foreground); }
+  .figure { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+  .score { font-family: var(--font-mono); font-size: 2.6rem; line-height: 1; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .of { font-size: 0.82rem; color: var(--muted-foreground); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 600; color: var(--buy); background: color-mix(in oklab, var(--buy) 16%, transparent); margin-bottom: 4px; }
+  .pill i { width: 6px; height: 6px; border-radius: 999px; background: var(--buy); }
+  .scale { padding-top: 18px; }
+  .track { position: relative; height: 8px; border-radius: 999px; background: var(--muted); }
+  .fill { position: absolute; inset: 0 auto 0 0; width: 53.3%; border-radius: 999px; background: var(--buy); }
+  .tick { position: absolute; top: -16px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+  .tick span { font-family: var(--font-mono); font-size: 0.62rem; line-height: 1; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+  .tick i { display: block; width: 1px; height: 12px; margin-top: 2px; background: color-mix(in oklab, var(--muted-foreground) 70%, transparent); }
+  .zones { display: flex; margin-top: 8px; font-size: 0.66rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); }
+  .ruling { margin: 0; font-size: 0.95rem; line-height: 1.5; text-wrap: pretty; }
+  .card-foot { border-top: 1px solid var(--border); padding-top: 10px; font-size: 0.72rem; color: var(--muted-foreground); }
+
+  .chat { display: flex; flex-direction: column; gap: 10px; }
+  .bubble { display: flex; flex-direction: column; gap: 4px; max-width: 92%; padding: 10px 12px; border-radius: var(--radius); border-top-left-radius: min(var(--radius), 4px); background: var(--muted); border: 1px solid var(--border); font-size: 0.86rem; line-height: 1.45; }
+  .bubble .who { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; }
+  .bubble .who i { width: 8px; height: 8px; border-radius: 999px; background: var(--who); box-shadow: 0 0 10px var(--who); }
+  .bubble .who span { color: var(--who); }
+  .bubble p { margin: 0; color: var(--card-foreground); }
+  .bubble .lean { align-self: flex-end; margin-top: 2px; font-size: 0.66rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); background: var(--background); color: var(--lean); }
+  .typing { display: flex; align-items: center; gap: 8px; font-size: 0.74rem; color: var(--muted-foreground); }
+  .dots { display: inline-flex; gap: 4px; padding: 8px 10px; border-radius: 999px; background: var(--muted); }
+  .dots i { width: 6px; height: 6px; border-radius: 999px; background: var(--guardian); opacity: 0.4; animation: bounce 1.2s infinite; }
+  .dots i:nth-child(2) { animation-delay: 0.15s; } .dots i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+  .cta { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: var(--radius); background: var(--primary); color: var(--primary-foreground); font: inherit; font-weight: 700; font-size: 0.86rem; cursor: pointer; }
+  .cta.alt { background: var(--secondary); color: var(--primary-foreground); }
+  .ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .note { margin: 0; font-family: var(--font-page); letter-spacing: 0; font-size: 0.86rem; line-height: 1.5; color: var(--muted-foreground); border-top: 1px solid var(--border); padding-top: 12px; }
+  .note b { color: var(--card-foreground); font-weight: 600; }
+  .choose { margin-top: auto; align-self: stretch; height: 42px; border-radius: 999px; border: 1px solid var(--page-accent); background: transparent; color: var(--page-accent); font-family: var(--font-page); letter-spacing: 0; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .theme[data-chosen="true"] .choose { background: var(--page-accent); color: #0b0b0c; }
+
+  .picks { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--page-panel); border-top: 1px solid var(--page-border);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .picks-in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .picks code { flex: 1 1 200px; min-width: 0; font-family: ui-monospace, Menlo, monospace; font-size: 0.86rem; color: var(--page-strong); user-select: all; }
+  .copy { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--page-border); background: transparent; color: var(--page-fg); font: inherit; font-size: 0.86rem; cursor: pointer; }
+  .copy:focus-visible, .choose:focus-visible, .cta:focus-visible { outline: 2px solid var(--page-accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .dots i { animation: none; opacity: 0.8; } .theme { transition: none; } }
+</style>
+
+<div class="wrap">
+  <h1>Which theme should the council wear?</h1>
+  <p class="lede">Three dark themes from 21st.dev, each applied as published (its colors, corners, letter spacing and <b>its own fonts</b>) to the same verdict card, two real lines from the headphones debate, and a button. The verdict and agent colors are ours and stay the same in every column. Tap <b>Choose</b> on one, then copy the line at the bottom into the chat.</p>
+
+  <div class="board">
+
+    <section class="theme t-darkmatter" data-theme="Darkmatter" aria-label="Theme Darkmatter">
+      <div class="theme-head">
+        <h2 class="theme-name">Darkmatter</h2>
+        <span class="theme-by">by <a href="https://21st.dev/community/themes/darkmatter">serafimcloud</a></span>
+      </div>
+      <div class="swatches" aria-label="Darkmatter colors">
+        <div class="sw"><i style="background:#121113"></i><span>background</span></div>
+        <div class="sw"><i style="background:#121212"></i><span>card</span></div>
+        <div class="sw"><i style="background:#222222"></i><span>muted</span></div>
+        <div class="sw"><i style="background:#333333"></i><span>accent</span></div>
+        <div class="sw"><i style="background:#c1c1c1"></i><span>text</span></div>
+        <div class="sw"><i style="background:#888888"></i><span>muted text</span></div>
+        <div class="sw"><i style="background:#e78a53"></i><span>primary</span></div>
+        <div class="sw"><i style="background:#5f8787"></i><span>secondary</span></div>
+      </div>
+      <article class="card" aria-label="Sample verdict card">
+        <p class="eyebrow">The council's verdict</p>
+        <h3 class="item">Noise-cancelling headphones</h3>
+        <p class="facts">$350 · want 7 of 10 · replaces Cheap wired earbuds</p>
+        <div class="figure"><span class="score">5.8</span><span class="of">of 10</span><span class="pill"><i></i>Buy</span></div>
+        <div class="scale" role="img" aria-label="Score 5.8 of 10 on a Skip, Wait, Buy scale">
+          <div class="track"><div class="fill"></div><div class="tick" style="left:38.9%"><span>4.5</span><i></i></div><div class="tick" style="left:50%"><span>5.5</span><i></i></div></div>
+          <div class="zones"><span style="width:38.9%">Skip</span><span style="width:11.1%;text-align:center">Wait</span><span style="flex:1;text-align:right">Buy</span></div>
+        </div>
+        <p class="ruling">The cost per use is reasonable given the daily commute benefit.</p>
+        <div class="card-foot">2 rounds · 5 min 13 s · qwen2.5:14b</div>
+      </article>
+      <div class="chat">
+        <div class="bubble" style="--who:var(--analyst);--lean:var(--buy)"><div class="who"><i></i><span>The Analyst</span></div><p>The headphones cost about $0.22 per use, assuming you use them 5 times a week for 3 years. You could resell them for about $177 after 3 years.</p><span class="lean">leans Buy</span></div>
+        <div class="bubble" style="--who:var(--future);--lean:var(--wait)"><div class="who"><i></i><span>Future You</span></div><p>The Analyst's cost per use calculation seems reasonable, but it doesn't capture the actual use pattern.</p><span class="lean">leans Wait</span></div>
+        <div class="typing"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Budget Guardian is typing</div>
+      </div>
+      <div class="ctas"><button type="button" class="cta">Replay the debate</button><button type="button" class="cta alt">Under the hood</button></div>
+      <p class="note"><b>My take: recommended.</b> Calm neutrals with one warm accent and a teal secondary; the agent colors sit well on it. Monospace everywhere is the theme's own choice and suits the under-the-hood feel; it stays readable at bubble size. One watch-out: the orange primary sits close to the Wait amber, so buttons could take the teal instead. Rounded corners, light shadows.</p>
+      <button type="button" class="choose" data-choose="Darkmatter">Choose Darkmatter</button>
+    </section>
+
+    <section class="theme t-violet" data-theme="Violet Dark" aria-label="Theme Violet Dark">
+      <div class="theme-head">
+        <h2 class="theme-name">Violet Dark</h2>
+        <span class="theme-by">by <a href="https://21st.dev/community/themes/violet-dark-1789799839906">ryan_d38f796e</a></span>
+      </div>
+      <div class="swatches" aria-label="Violet Dark colors">
+        <div class="sw"><i style="background:#050505"></i><span>background</span></div>
+        <div class="sw"><i style="background:#0d0d0d"></i><span>card</span></div>
+        <div class="sw"><i style="background:#1a1a1a"></i><span>muted</span></div>
+        <div class="sw"><i style="background:#ff0055"></i><span>accent</span></div>
+        <div class="sw"><i style="background:#00ff9f"></i><span>text</span></div>
+        <div class="sw"><i style="background:#777777"></i><span>muted text</span></div>
+        <div class="sw"><i style="background:#bc13fe"></i><span>primary</span></div>
+        <div class="sw"><i style="background:#00b8ff"></i><span>secondary</span></div>
+      </div>
+      <article class="card" aria-label="Sample verdict card">
+        <p class="eyebrow">The council's verdict</p>
+        <h3 class="item">Noise-cancelling headphones</h3>
+        <p class="facts">$350 · want 7 of 10 · replaces Cheap wired earbuds</p>
+        <div class="figure"><span class="score">5.8</span><span class="of">of 10</span><span class="pill"><i></i>Buy</span></div>
+        <div class="scale" role="img" aria-label="Score 5.8 of 10 on a Skip, Wait, Buy scale">
+          <div class="track"><div class="fill"></div><div class="tick" style="left:38.9%"><span>4.5</span><i></i></div><div class="tick" style="left:50%"><span>5.5</span><i></i></div></div>
+          <div class="zones"><span style="width:38.9%">Skip</span><span style="width:11.1%;text-align:center">Wait</span><span style="flex:1;text-align:right">Buy</span></div>
+        </div>
+        <p class="ruling">The cost per use is reasonable given the daily commute benefit.</p>
+        <div class="card-foot">2 rounds · 5 min 13 s · qwen2.5:14b</div>
+      </article>
+      <div class="chat">
+        <div class="bubble" style="--who:var(--analyst);--lean:var(--buy)"><div class="who"><i></i><span>The Analyst</span></div><p>The headphones cost about $0.22 per use, assuming you use them 5 times a week for 3 years. You could resell them for about $177 after 3 years.</p><span class="lean">leans Buy</span></div>
+        <div class="bubble" style="--who:var(--future);--lean:var(--wait)"><div class="who"><i></i><span>Future You</span></div><p>The Analyst's cost per use calculation seems reasonable, but it doesn't capture the actual use pattern.</p><span class="lean">leans Wait</span></div>
+        <div class="typing"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Budget Guardian is typing</div>
+      </div>
+      <div class="ctas"><button type="button" class="cta">Replay the debate</button><button type="button" class="cta alt">Under the hood</button></div>
+      <p class="note"><b>My take: the loudest.</b> Neon on black with Orbitron, wide letter spacing, square corners and a pink glow around everything. It has attitude, but the theme sets ordinary text in neon green, which tires the eye over a 500-word debate, and its pink and cyan fight the verdict colors. Fits a game launch more than a decision helper.</p>
+      <button type="button" class="choose" data-choose="Violet Dark">Choose Violet Dark</button>
+    </section>
+
+    <section class="theme t-slate" data-theme="Slate Dark" aria-label="Theme Slate Dark">
+      <div class="theme-head">
+        <h2 class="theme-name">Slate Dark</h2>
+        <span class="theme-by">by <a href="https://21st.dev/community/themes/slate-dark-1789202367405">soulrenderlive-design</a></span>
+      </div>
+      <div class="swatches" aria-label="Slate Dark colors">
+        <div class="sw"><i style="background:hsl(0 0% 10%)"></i><span>background</span></div>
+        <div class="sw"><i style="background:hsl(0 0% 12%)"></i><span>card</span></div>
+        <div class="sw"><i style="background:hsl(0 0% 15%)"></i><span>muted</span></div>
+        <div class="sw"><i style="background:hsl(345 100% 20%)"></i><span>accent</span></div>
+        <div class="sw"><i style="background:hsl(0 0% 98%)"></i><span>text</span></div>
+        <div class="sw"><i style="background:hsl(0 0% 65%)"></i><span>muted text</span></div>
+        <div class="sw"><i style="background:hsl(345 100% 45%)"></i><span>primary</span></div>
+        <div class="sw"><i style="background:hsl(0 0% 20%)"></i><span>secondary</span></div>
+      </div>
+      <article class="card" aria-label="Sample verdict card">
+        <p class="eyebrow">The council's verdict</p>
+        <h3 class="item">Noise-cancelling headphones</h3>
+        <p class="facts">$350 · want 7 of 10 · replaces Cheap wired earbuds</p>
+        <div class="figure"><span class="score">5.8</span><span class="of">of 10</span><span class="pill"><i></i>Buy</span></div>
+        <div class="scale" role="img" aria-label="Score 5.8 of 10 on a Skip, Wait, Buy scale">
+          <div class="track"><div class="fill"></div><div class="tick" style="left:38.9%"><span>4.5</span><i></i></div><div class="tick" style="left:50%"><span>5.5</span><i></i></div></div>
+          <div class="zones"><span style="width:38.9%">Skip</span><span style="width:11.1%;text-align:center">Wait</span><span style="flex:1;text-align:right">Buy</span></div>
+        </div>
+        <p class="ruling">The cost per use is reasonable given the daily commute benefit.</p>
+        <div class="card-foot">2 rounds · 5 min 13 s · qwen2.5:14b</div>
+      </article>
+      <div class="chat">
+        <div class="bubble" style="--who:var(--analyst);--lean:var(--buy)"><div class="who"><i></i><span>The Analyst</span></div><p>The headphones cost about $0.22 per use, assuming you use them 5 times a week for 3 years. You could resell them for about $177 after 3 years.</p><span class="lean">leans Buy</span></div>
+        <div class="bubble" style="--who:var(--future);--lean:var(--wait)"><div class="who"><i></i><span>Future You</span></div><p>The Analyst's cost per use calculation seems reasonable, but it doesn't capture the actual use pattern.</p><span class="lean">leans Wait</span></div>
+        <div class="typing"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Budget Guardian is typing</div>
+      </div>
+      <div class="ctas"><button type="button" class="cta">Replay the debate</button><button type="button" class="cta alt">Under the hood</button></div>
+      <p class="note"><b>My take: clean but miscast.</b> Near-neutral greys, bright white text and Poppins read well on a phone, and the small 4px corners feel crisp. The problem is the crimson primary: every button looks like a warning and sits right next to the Skip red. Its grey secondary gives nothing to pick things out with. Fixable by swapping the primary, but then little of the theme is left.</p>
+      <button type="button" class="choose" data-choose="Slate Dark">Choose Slate Dark</button>
+    </section>
+
+  </div>
+</div>
+
+<div class="picks" role="region" aria-label="Your pick">
+  <div class="picks-in">
+    <code id="pick-line" aria-live="polite">Theme: nothing chosen yet</code>
+    <button type="button" class="copy" id="copy">Copy</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var line = document.getElementById("pick-line");
+    var columns = document.querySelectorAll(".theme");
+    var copyButton = document.getElementById("copy");
+    function choose(name) {
+      columns.forEach(function (column) {
+        column.dataset.chosen = column.dataset.theme === name ? "true" : "false";
+      });
+      line.textContent = "Theme: " + name;
+    }
+    document.querySelectorAll("[data-choose]").forEach(function (button) {
+      button.addEventListener("click", function () { choose(button.dataset.choose); });
+    });
+    copyButton.addEventListener("click", function () {
+      var text = line.textContent;
+      function fallback() {
+        var range = document.createRange();
+        range.selectNodeContents(line);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        copyButton.textContent = "Selected";
+        setTimeout(function () { copyButton.textContent = "Copy"; }, 1500);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          copyButton.textContent = "Copied";
+          setTimeout(function () { copyButton.textContent = "Copy"; }, 1500);
+        }, fallback);
+      } else {
+        fallback();
+      }
+    });
+  })();
+</script>

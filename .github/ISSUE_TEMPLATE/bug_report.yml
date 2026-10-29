@@ -1,0 +1,24 @@
+name: Bug report
+description: Something on the site or in the engine doesn't work the way it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open the gallery\n2. Choose Newest flagship phone\n3. Press Watch the debate\n4. ..."
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      description: For a problem on the site.
+      placeholder: Safari 26 on iPhone

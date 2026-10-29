@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # The site. Its packages are pinned to exact versions in ui/package.json; Dependabot proposes the bump as a
+  # pull request and CI builds it. wrangler holds the Cloudflare login, so read its updates before merging.
+  - package-ecosystem: npm
+    directory: /ui
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  # The engine: ollama and pydantic, pinned in requirements.txt.
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

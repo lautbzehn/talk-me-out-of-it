@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/gallery/
+
+# Cloudflare local state (wrangler dev)
+.wrangler/
+.dev.vars

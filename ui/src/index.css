@@ -1,0 +1,154 @@
+@import "tailwindcss";
+/* Self-hosted fonts: the @font-face rules and .woff2 files ship with the site, no font host. */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/*
+  One visual system for the whole app. Dark only, by the brief.
+
+  Base tokens: the "Darkmatter" dark set from 21st.dev (see ui/pulled/REVIEW.md),
+  which Dan chose on the theme board (10.29.2026). Swapping the theme
+  means replacing the values in this one block; nothing else in the app names a color.
+
+  Verdict and agent colors are ours and stay the same whichever theme wins. They are kept
+  away from each other on purpose: verdicts use green, amber and red, agents use teal,
+  violet, rose, sky and ivory, so a bubble never looks like a verdict.
+*/
+:root {
+  color-scheme: dark;
+
+  --background: #121113;
+  --foreground: #c1c1c1;
+  --foreground-strong: #f2efea;
+  --card: #121212;
+  --card-foreground: #c1c1c1;
+  --muted: #222222;
+  --muted-foreground: #8f8f8f;
+  --accent: #333333;
+  --primary: #e78a53;
+  --primary-foreground: #121113;
+  --secondary: #5f8787;
+  --border: #262626;
+  --ring: #e78a53;
+  --radius: 0.75rem;
+
+  --verdict-buy: #4ade80;
+  --verdict-wait: #fbbf24;
+  --verdict-skip: #f87171;
+
+  --agent-analyst: #5fb3b3;
+  --agent-future: #a78bfa;
+  --agent-guardian: #f472b6;
+  --agent-hunter: #60a5fa;
+  --agent-judge: #e7dfd6;
+
+  /* The warm light on the gallery cards (the pulled Feature Grid card expects these two names). */
+  --warm: var(--primary);
+  --warm-glow: color-mix(in oklab, var(--primary) 9%, transparent);
+}
+
+/* Tailwind reads these and makes utilities out of them: bg-background, text-buy, rounded-card... */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-strong: var(--foreground-strong);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --color-buy: var(--verdict-buy);
+  --color-wait: var(--verdict-wait);
+  --color-skip: var(--verdict-skip);
+
+  --color-analyst: var(--agent-analyst);
+  --color-future: var(--agent-future);
+  --color-guardian: var(--agent-guardian);
+  --color-hunter: var(--agent-hunter);
+  --color-judge: var(--agent-judge);
+
+  --radius-card: var(--radius);
+
+  /* Darkmatter's faces, self-hosted (Dan approved 10.29.2026). Geist Mono for headings, labels
+     and numbers (font-mono); Geist Sans for message and body text, which reads better over a
+     long debate. The system stacks stay as fallbacks while the files load. */
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/*
+  Keyframes, each used by one component:
+  typing-dot     the debate's typing indicator; each dot rises and brightens in turn
+  aurora-drift   the hero background; each blob drifts slowly (durations and delays set per blob)
+  shimmer-sweep  the call-to-action link; a soft sheen crosses it every few seconds
+*/
+@theme {
+  --animate-typing-dot: typing-dot 1.2s ease-in-out infinite;
+  --animate-aurora-drift: aurora-drift 20s ease-in-out infinite alternate;
+  --animate-shimmer-sweep: shimmer-sweep 3.2s ease-in-out infinite;
+
+  @keyframes aurora-drift {
+    from {
+      transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    }
+    to {
+      transform: translate3d(6vmax, 3vmax, 0) scale(1.18) rotate(14deg);
+    }
+  }
+
+  @keyframes shimmer-sweep {
+    0% {
+      transform: translateX(-150%) skewX(-20deg);
+    }
+    55%,
+    100% {
+      transform: translateX(420%) skewX(-20deg);
+    }
+  }
+
+  @keyframes typing-dot {
+    0%,
+    60%,
+    100% {
+      opacity: 0.32;
+      transform: scale(0.74);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+html {
+  height: 100%;
+}
+
+/* "Watch the council" and "Back to the gallery" are plain links to #gallery; this makes the jump a glide. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Keyboard users always see where they are. */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

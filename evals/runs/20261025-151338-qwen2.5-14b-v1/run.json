@@ -1,0 +1,46 @@
+{
+  "run_id": "20261025-151338-qwen2.5-14b-v1",
+  "model": "qwen2.5:14b",
+  "formula_version": 1,
+  "scenarios_version": "v1.0",
+  "repeats": 1,
+  "request_timeout_seconds": 180,
+  "started_at": "2026-10-25T22:13:38+00:00",
+  "finished_at": "2026-10-25T22:29:48+00:00",
+  "scenarios": [
+    {
+      "id": "ps5-pro-upgrade",
+      "expected": "skip",
+      "category": "console",
+      "tags": [
+        "works_fine_upgrade",
+        "phase4_sample"
+      ],
+      "why_expected": "The console they own works fine and the only reason is a video comparison. A small gain for the price.",
+      "purchase": {
+        "item": "PlayStation 5 Pro",
+        "price": 700.0,
+        "why": "My PS5 works fine, but the Pro looks sharper in the videos I've watched.",
+        "want_level": 8,
+        "current_device": "PlayStation 5"
+      }
+    },
+    {
+      "id": "new-color-phone",
+      "expected": "skip",
+      "category": "phone",
+      "tags": [
+        "impulse_duplicate",
+        "works_fine_upgrade"
+      ],
+      "why_expected": "A nearly new phone that works perfectly. A color is not worth the price of a flagship.",
+      "purchase": {
+        "item": "Newest flagship phone",
+        "price": 1200.0,
+        "why": "My phone is 10 months old and works perfectly, but the new one comes in a color I love.",
+        "want_level": 8,
+        "current_device": "10-month-old flagship phone"
+      }
+    }
+  ]
+}

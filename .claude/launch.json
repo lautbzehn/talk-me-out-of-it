@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "ui", "--", "--port", "5173", "--strictPort"],
+      "port": 5173
+    },
+    {
+      "name": "ui-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--prefix", "ui", "--", "--port", "4173", "--strictPort"],
+      "port": 4173
+    },
+    {
+      "name": "ui-cloudflare",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview:cloudflare", "--prefix", "ui"],
+      "port": 8788
+    }
+  ]
+}

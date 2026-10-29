@@ -1,0 +1,16 @@
+// Cloudflare settings for publishing. `npm run deploy` builds the site and uploads ./dist.
+// Same shape as the Navigator's and The Unlisted's, minus the server program: this site is only files.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "talk-me-out-of-it",
+  "compatibility_date": "2026-10-01",
+  // No Worker script (no "main"), so Cloudflare serves ./dist as it is. A path with no file (an old or
+  // mistyped /s/<id> link) gets index.html, and the app says that session is not in the gallery.
+  // /s/<id> is served from s/<id>.html, the page with that session's link-preview tags.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  // Serves the site at this address and creates its DNS record on icarianforge.com automatically.
+  "routes": [{ "pattern": "talk.icarianforge.com", "custom_domain": true }]
+}
