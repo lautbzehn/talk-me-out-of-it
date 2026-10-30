@@ -117,10 +117,8 @@ async function visit(path, { width = 1024, height = 800, mobile = false, openHoo
   await page.send("Page.navigate", { url: `${base}${path}` });
   await loaded;
   await sleep(2500); // the gallery index and the transcript are fetched after load
-  if (openHood) {
-    await page.run(`document.querySelector('#hood-title button')?.click()`);
-    await sleep(2500);
-  }
+  // Under the hood is always open now; give its lazily loaded panels time to arrive.
+  if (openHood) await sleep(2500);
   return page;
 }
 

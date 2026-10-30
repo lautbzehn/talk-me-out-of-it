@@ -9,8 +9,9 @@
   the Judge explains, the verdict). On a phone it is one column with a wire between each stage.
 
   Motion: the stages pop in one by one as they scroll into view, and the wires draw between them.
-  Once all of it is in, a small light runs along the wires in order, the way a purchase travels.
-  With reduced motion everything is simply there and nothing moves.
+  Once all of it is in, sparks run along the wires in order, the way a purchase travels, and
+  cross back and forth between the four members while they debate (they answer each other in
+  the rebuttal round). With reduced motion everything is simply there and nothing moves.
 */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { m, useReducedMotion, type Variants } from "motion/react";
@@ -299,8 +300,54 @@ function IconTile({ icon: Icon }: { icon: LucideIcon }) {
   );
 }
 
-function AgentCard({ agent, step }: { agent: AgentStyle; step: number }) {
+/* When the sparks cross between the members, in seconds into the loop: between the fan out
+   (its legs light at 1.05) and the fan in (2.5). */
+const OPENING_FLOW = 1.45;
+const REBUTTAL_FLOW = 1.85;
+const CROSS_STEP = 0.12;
+
+/**
+  The wires between the members: the debate itself. Two run through each gap between neighbors,
+  one each way, since each member reads the others and answers them by name. At lg the four sit
+  in a row, so there are three gaps; at sm they sit two by two, so the gaps run across each row
+  and down each column; on a phone they are one column, and a single wire runs down to the next.
+*/
+function Crosstalk({ index }: { index: number }) {
+  const across = index === 1 ? "hidden lg:block" : index === 0 || index === 2 ? "hidden sm:block" : null;
+  return (
+    <>
+      {across ? (
+        <>
+          <Wire axis="x" flow={OPENING_FLOW + index * CROSS_STEP} step={index + 3} className={cn("left-full top-[38%] w-8", across)} />
+          <Wire
+            axis="x"
+            reverse
+            flow={REBUTTAL_FLOW + (2 - index) * CROSS_STEP}
+            step={index + 3}
+            className={cn("left-full top-[62%] w-8", across)}
+          />
+        </>
+      ) : null}
+      {index < 2 ? (
+        <>
+          <Wire axis="y" flow={OPENING_FLOW + 0.06 + index * CROSS_STEP} step={index + 3} className="left-[38%] top-full hidden h-4 sm:block lg:hidden" />
+          <Wire
+            axis="y"
+            reverse
+            flow={REBUTTAL_FLOW + 0.06 + (1 - index) * CROSS_STEP}
+            step={index + 3}
+            className="left-[62%] top-full hidden h-4 sm:block lg:hidden"
+          />
+        </>
+      ) : null}
+      {index < 3 ? <Wire axis="y" flow={1.1 + index * 0.3} step={index + 3} className="left-1/2 top-full h-4 sm:hidden" /> : null}
+    </>
+  );
+}
+
+function AgentCard({ agent, index }: { agent: AgentStyle; index: number }) {
   const about = ROLES[agent.name];
+  const step = index + 2;
   return (
     <m.li
       variants={pop}
@@ -330,6 +377,7 @@ function AgentCard({ agent, step }: { agent: AgentStyle; step: number }) {
           </p>
         ) : null}
       </div>
+      <Crosstalk index={index} />
     </m.li>
   );
 }
@@ -403,10 +451,10 @@ export function HowItWorks() {
           <Fan kind="out" label="Step 3 · The debate: 2 or 3 rounds" flowStart={0.45} step={0} />
           <ul className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
             {DEBATERS.map((agent, i) => (
-              <AgentCard key={agent.name} agent={agent} step={i + 2} />
+              <AgentCard key={agent.name} agent={agent} index={i} />
             ))}
           </ul>
-          <Fan kind="in" label="12 ratings, 1 to 10 each" flowStart={2.1} step={6} />
+          <Fan kind="in" label="12 ratings, 1 to 10 each" flowStart={2.5} step={6} />
         </m.li>
 
         {/* 4. Code scores it */}
@@ -429,8 +477,8 @@ export function HowItWorks() {
               </p>
             </StageCard>
           </m.div>
-          <Wire axis="x" flow={2.95} step={1} className="left-full top-1/2 hidden w-8 lg:block" />
-          <Wire axis="y" flow={2.95} step={1} className="left-1/2 top-full hidden h-8 max-lg:block" />
+          <Wire axis="x" flow={3.35} step={1} className="left-full top-1/2 hidden w-8 lg:block" />
+          <Wire axis="y" flow={3.35} step={1} className="left-1/2 top-full hidden h-8 max-lg:block" />
         </m.li>
 
         {/* 5. The Judge */}
@@ -447,8 +495,8 @@ export function HowItWorks() {
               </p>
             </StageCard>
           </m.div>
-          <Wire axis="x" flow={3.35} step={1} className="left-full top-1/2 hidden w-8 lg:block" />
-          <Wire axis="y" flow={3.35} step={1} className="left-1/2 top-full hidden h-8 max-lg:block" />
+          <Wire axis="x" flow={3.75} step={1} className="left-full top-1/2 hidden w-8 lg:block" />
+          <Wire axis="y" flow={3.75} step={1} className="left-1/2 top-full hidden h-8 max-lg:block" />
         </m.li>
 
         {/* 6. The verdict */}
@@ -479,8 +527,8 @@ export function HowItWorks() {
         <div className="flex flex-col gap-1.5">
           <h3 className="font-mono text-base font-semibold text-foreground-strong">The model judges. The code calculates.</h3>
           <p className="text-sm leading-relaxed text-muted-foreground text-pretty">
-            Built from scratch to show how a multi-agent system works inside. Open any session's Under the hood to see its
-            prompts, tool calls and the scoring math.
+            Built from scratch to show how a multi-agent system works inside. Every session plays its Under the hood right
+            beside the debate: each model call and tool call as it happens, then the prompts and the scoring math.
           </p>
         </div>
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
