@@ -1,5 +1,5 @@
 # Talk Me Out of It
-Project brief · v1.2 · 10.23.2026
+Project brief · v1.3 · 10.29.2026
 
 ## What this is
 A multi-agent "council" that debates whether someone should buy an expensive tech gadget
@@ -134,7 +134,7 @@ Using 21st.dev:
 ## Project standards
 - Version every document and UI release as vX.X with mm.dd.yyyy. Keep a CHANGELOG.md.
 - This file must stay named CLAUDE.md, so its version lives in the header above.
-- Commit to git at the end of every milestone with a clear message. Private GitHub repo.
+- Commit to git at the end of every milestone with a clear message. Public GitHub repo; the history from before publication is in a private archive repo.
 
 ## Folder structure
 talk-me-out-of-it/
@@ -162,3 +162,6 @@ talk-me-out-of-it/
 - Agent engine stays pure Python, built from scratch
 - 21st.dev moved from inspiration only to active use of components and themes
 - Added a security review step for any pulled component code
+
+## Changes in v1.3 · 10.29.2026
+- The GitHub repo is public, starting from one clean commit; the earlier history is in the private archive repo
