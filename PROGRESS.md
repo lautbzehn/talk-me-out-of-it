@@ -1,5 +1,5 @@
 # Progress Tracker
-v1.44 · 10.29.2026
+v1.45 · 10.29.2026
 
 Two trackers, two jobs:
 - **Live steps:** the Tasks pane on the right of the Claude Code window shows every step of the current session as it happens.
@@ -18,7 +18,7 @@ This file holds the current state and the rules. The full history (designs, mile
 | 5 | Scoring code, tests, evaluation script | Done | 10.28.2026 |
 | 6 | Sessions saved as JSON with traces; curate the gallery | Done | 10.28.2026 |
 | 7 | Replay UI | Done: verdict card, debate as a group chat, hero, background and gallery cards, Under the hood, one URL per session and the share card (UI v0.5); theme Darkmatter with self-hosted Geist fonts | 10.29.2026 |
-| 8 | Marketability pass, publish to icarianforge.com | Nearly done: live at talk.icarianforge.com, on the portfolio at www.icarianforge.com/work/talk-me-out-of-it/ with its Code on GitHub button (Steps 10 and 11), and the code public on GitHub since 10.29.2026 with CLAUDE.md v1.3 merged (Step 11). README screenshots merged (pull request 3). Left for Dan: ship the portfolio's v0.6 images (Step 13) and upload the social preview | |
+| 8 | Marketability pass, publish to icarianforge.com | Nearly done: live at talk.icarianforge.com, on the portfolio at www.icarianforge.com/work/talk-me-out-of-it/ with its Code on GitHub button (Steps 10 and 11), and the code public on GitHub since 10.29.2026 with CLAUDE.md v1.3 merged (Step 11). README screenshots merged (pull request 3). Release notes cut as v0.5 and v0.6 (Step 14). Left for Dan: ship the portfolio's v0.6 images (Step 13) and upload the social preview | |
 
 ## Environment
 
@@ -560,7 +560,7 @@ Where things stand: Phase 7 is done (10.29.2026): the landing hero and gallery, 
 
 Open for Dan:
 - **Judge reliability milestone** stays parked (decided earlier; the gallery sessions are clean).
-- **Release:** CHANGELOG.md still lists everything since v0.4 under "Unreleased (rolls into v0.5)". Phase 7 complete is a natural point to cut it; Dan's call.
+- **Release:** done 10.29.2026 on Dan's go: v0.5 and v0.6 are dated releases in CHANGELOG.md, matching the live footer (Step 14).
 
 ## Phase 8: marketability and publishing (in progress)
 
@@ -747,6 +747,10 @@ Pull request 2 was merged and UI v0.6 deployed, then every image that shows the 
 - **Checked:** the portfolio's own tests, 71 of 71; the work page served from the branch by a static server and looked at in the browser pane at 1280 and 375 px: all five figures load from the new webp files at the right sizes, no sideways scroll, and no console errors except the insights beacon's POST, which a static server cannot answer (same as last time). Not checked: the real deploy.
 - **To ship (Dan):** (1) done 10.29.2026: pull request 3 merged as `f27c89c` after CI passed, and pulled here; nothing to deploy, because `docs/` is not part of the site. (2) Upload the social preview. (3) In `~/AI Projects/icarianforge-site`, one line: `cd "/Users/danwest/AI Projects/icarianforge-site" && git merge --ff-only work/talk-v06-images && npx wrangler deploy && git push`. The portfolio's `main` is `7e6abd8`, deployed and pushed with the Code on GitHub button on 10.29.2026, and the images branch is one commit on top of it, so the fast-forward still works (checked). The output should list the 17 changed image files. Then open `www.icarianforge.com/work/talk-me-out-of-it/` and look at the stage.
 
+### Step 14: the release notes cut (done 10.29.2026, Fable 5.1, on Dan's word)
+
+A session started to "begin Phase 8" found it already live. Its Step 0 check: the five Phase 7 milestones merged, three pull requests merged and none open, no branch holding unmerged work, the build passing (118.7 KB gzipped main bundle), the site and the per-session preview tags answering from outside, the code public. The one gap against its brief was the changelog, which still held everything since v0.4 under two Unreleased headings. With Dan's go they are now `v0.5 · 10.29.2026` (Phases 5 to 7, the first deploy, the case study, the portfolio page and the public repository) and `v0.6 · 10.29.2026` (How it works, the matte palette and the matching images), each with a one-line summary on top, and an empty Unreleased heading sits above them for what comes next. Notes-only commit on `main`; nothing to deploy, because the changelog is not part of the site. Still Dan's: the portfolio's v0.6 images and the social preview (Step 13).
+
 Still to do (Phase 8 as a whole):
 - **Follow the portfolio's structure** (Dan, 10.29.2026; what the sibling projects do is in memory `project-follow-portfolio-structure`, and the templates are `~/AI Projects/the-unlisted` and `PM AI Workflow Tool`). This replaces the earlier plan to deploy on Cloudflare Pages. Proposed conversion, approved in order by Dan: (1) **done on branch `deploy/worker-config`, see Step 3 below**: a `wrangler.jsonc` serving `ui/dist` as a Worker with static assets on `talk.icarianforge.com`, deployed from the Mac with `npm run deploy`; (2) the repo skeleton: **done on the branch: see Steps 4 and 5**; (3) docs in the family format: **README, architecture doc, seven decision records, banner and screenshots done, see Steps 6 and 7**; (4) the branch, pull request and CI workflow, and the matching update to CLAUDE.md (his document; only with his go); (5) a work page, home card and short link in the `icarianforge-site` repo: **done on branch `work/talk-me-out-of-it` in that repo, see Step 10**. Open questions for Dan: adopt uv, ruff and mypy for the engine (new dev dependencies, like Temper), and send the portfolio's anonymous visit counts like The Unlisted does.
 - **README case study** (what it does, how the agent system works, an architecture diagram, key decisions, eval results) and an accessibility and speed check come within that conversion: the case study is done (Steps 6 and 7) and so is the check (Step 9, live). GitHub and Cloudflare need Dan: pushing and the Cloudflare account are his.
@@ -754,7 +758,7 @@ Still to do (Phase 8 as a whole):
 Phase 7 prep, checked 10.29.2026:
 - **Dev server:** `.claude/launch.json` has a `ui` entry for the browser pane (`npm run dev --prefix ui`, port 5173). Build with `npm run build --prefix ui`; `npm run typecheck --prefix ui` type-checks alone.
 
-Model for the next session (updated 10.29.2026, after the public repository):
+Model for the next session (updated 10.29.2026, after the release cut):
 - **Dan first**: ship the portfolio's new images (Step 13; the GitHub button is already live); upload the social preview; decide on the CLAUDE.md changes it still lacks (the pull request flow, Workers instead of Pages, file-name versions); listen to the verdict card and the playhead slider in VoiceOver; look at a pasted link in a chat app; and the two open questions, sending visit counts to the portfolio and adopting uv, ruff and mypy.
 - **Sonnet 5.5** for any small fix after the deploy (a crop, a line of copy, a shorter first Mermaid diagram in the README) and for Dependabot's pull requests.
 - **Fable 5.1 or Opus 5.5** only if Dan picks a design-heavy step: a council that holds its ground (a scoring choice or one prompt rule) or a plan for live mode with a spending cap.
