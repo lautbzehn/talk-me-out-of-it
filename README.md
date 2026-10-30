@@ -35,7 +35,7 @@
 > Built by **[Dan West](https://www.icarianforge.com)**, an AI strategy and operations leader with nearly 20 years in IT, as a learning project in Python and agent design, by directing Claude Code as the engineering team. A decision helper, not financial advice; nothing here buys anything or connects to a store.
 
 <p>
-  <img src="docs/screenshots/home.jpg" width="100%" alt="The landing page: the council's five orbs, the glowing name, the hook, and the gallery of purchases below">
+  <img src="docs/screenshots/home.jpg" width="100%" alt="The landing page: the council's five orbs, the glowing name, the hook, and the start of the How it works section below">
 </p>
 <p>
   <img src="docs/screenshots/debate.jpg" width="49%" alt="A verdict card, Buy at 5.8 of 10 for noise-cancelling headphones, and the debate below it as a group chat">
