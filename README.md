@@ -35,7 +35,7 @@
 > Built by **[Dan West](https://www.icarianforge.com)**, an AI strategy and operations leader with nearly 20 years in IT, as a learning project in Python and agent design, by directing Claude Code as the engineering team. A decision helper, not financial advice; nothing here buys anything or connects to a store.
 
 <p>
-  <img src="docs/screenshots/home.jpg" width="100%" alt="The landing page: the council's five orbs, the glowing name, the hook, and the gallery of purchases below">
+  <img src="docs/screenshots/home.jpg" width="100%" alt="The landing page: the council's five orbs, the glowing name, the hook, and the start of the How it works section below">
 </p>
 <p>
   <img src="docs/screenshots/debate.jpg" width="49%" alt="A verdict card, Buy at 5.8 of 10 for noise-cancelling headphones, and the debate below it as a group chat">
@@ -55,6 +55,14 @@
 | **Everything is on the record** | Under the hood shows every call, retry and tool result on a timeline. | Every session is one JSON transcript with a full trace and a snapshot of the engine that produced it. The site only reads transcripts. |
 
 ## How a verdict is reached
+
+The landing page walks a visitor through it in six steps:
+
+<p align="center">
+  <img src="docs/screenshots/how-it-works.jpg" width="80%" alt="The How it works section of the landing page: you describe the purchase, a quick check, four council members each rating it, Python scoring it, the Judge explaining the ruling, and your verdict, above the line that the model judges and the code calculates">
+</p>
+
+The exact flow in the engine, including the polite decline and the tiebreak round:
 
 ```mermaid
 flowchart TB
