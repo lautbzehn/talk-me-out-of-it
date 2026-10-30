@@ -1,5 +1,5 @@
 # Progress Tracker
-v1.38 · 10.29.2026
+v1.39 · 10.29.2026
 
 Two trackers, two jobs:
 - **Live steps:** the Tasks pane on the right of the Claude Code window shows every step of the current session as it happens.
@@ -18,7 +18,7 @@ This file holds the current state and the rules. The full history (designs, mile
 | 5 | Scoring code, tests, evaluation script | Done | 10.28.2026 |
 | 6 | Sessions saved as JSON with traces; curate the gallery | Done | 10.28.2026 |
 | 7 | Replay UI | Done: verdict card, debate as a group chat, hero, background and gallery cards, Under the hood, one URL per session and the share card (UI v0.5); theme Darkmatter with self-hosted Geist fonts | 10.29.2026 |
-| 8 | Marketability pass, publish to icarianforge.com | Nearly done: live at talk.icarianforge.com, on the portfolio at www.icarianforge.com/work/talk-me-out-of-it/ (Step 10), and the code public on GitHub since 10.29.2026 (Step 11). Left for Dan: deploy the portfolio's GitHub button, upload the social preview, and say yes or no to the CLAUDE.md line | |
+| 8 | Marketability pass, publish to icarianforge.com | Nearly done: live at talk.icarianforge.com, on the portfolio at www.icarianforge.com/work/talk-me-out-of-it/ (Step 10), and the code public on GitHub since 10.29.2026 (Step 11). Left for Dan: deploy the portfolio's GitHub button and upload the social preview | |
 
 ## Environment
 
@@ -719,7 +719,7 @@ Done the way The Unlisted was: a new repository built from the final tree with a
 - **README on GitHub, checked in the browser pane.** The banner, all eight badges (CI says passing), the four screenshots, the collapsible sections and both Mermaid diagrams render. The first diagram is tall (about 1,900 px at desktop width), a candidate for a shorter layout. The commit page lists "claude" next to Dan because of the co-author line.
 - **The portfolio.** In `icarianforge-site`, commit `7e6abd8` on `main`, not pushed and not deployed: the third button is now "Code on GitHub" (the same markup as The Unlisted's) and "Open the code" left the Next chapter, so two items remain there. Its tests pass, 71 of 71. Not looked at in a browser.
 - **To ship (Dan), one line:** `cd "/Users/danwest/AI Projects/icarianforge-site" && npx wrangler deploy && git push`. The output must print "Worker Name: icarianforge-site" and say files were uploaded, not "No updated asset files".
-- **Dan only.** Upload `~/AI Projects/github-social-previews/talk-me-out-of-it-social-preview.png` (1280 by 640) under the repository's Settings, General, Social preview. And decide on the one-line change to CLAUDE.md: "Private GitHub repo." (Project standards) would read "Public GitHub repo; the history before publication is in the private archive."
+- **Dan only.** Upload `~/AI Projects/github-social-previews/talk-me-out-of-it-social-preview.png` (1280 by 640) under the repository's Settings, General, Social preview. The CLAUDE.md line: Dan said yes, and pull request 1 on the public repo (branch `docs/claude-md-public`, Opus 5.5) makes it CLAUDE.md v1.3: "Private GitHub repo." now reads "Public GitHub repo; the history from before publication is in a private archive repo." This note travels with that pull request.
 - **How the repo works from here.** `origin` is the public repository. Code and config changes go on a branch through a pull request with CI; notes-only commits (this file and the changelog) go straight to `main`.
 
 Still to do (Phase 8 as a whole):
@@ -730,7 +730,7 @@ Phase 7 prep, checked 10.29.2026:
 - **Dev server:** `.claude/launch.json` has a `ui` entry for the browser pane (`npm run dev --prefix ui`, port 5173). Build with `npm run build --prefix ui`; `npm run typecheck --prefix ui` type-checks alone.
 
 Model for the next session (updated 10.29.2026, after the public repository):
-- **Dan first**: deploy the portfolio's GitHub button (the one line in Step 11); upload the social preview; say yes or no to the CLAUDE.md line (and to the other changes it still lacks: the pull request flow, Workers instead of Pages, file-name versions); listen to the verdict card and the playhead slider in VoiceOver; look at a pasted link in a chat app; and the two open questions, sending visit counts to the portfolio and adopting uv, ruff and mypy.
+- **Dan first**: deploy the portfolio's GitHub button (the one line in Step 11); upload the social preview; merge pull request 1 (CLAUDE.md v1.3) if it is still open; decide on the CLAUDE.md changes it still lacks (the pull request flow, Workers instead of Pages, file-name versions); listen to the verdict card and the playhead slider in VoiceOver; look at a pasted link in a chat app; and the two open questions, sending visit counts to the portfolio and adopting uv, ruff and mypy.
 - **Sonnet 5.5** for any small fix after the deploy (a crop, a line of copy, a shorter first Mermaid diagram in the README) and for Dependabot's pull requests.
 - **Fable 5.1 or Opus 5.5** only if Dan picks a design-heavy step: a council that holds its ground (a scoring choice or one prompt rule) or a plan for live mode with a spending cap.
 
