@@ -1,6 +1,6 @@
 # Architecture
 
-**v1.1 · 10.29.2026** · Talk Me Out of It, site v0.5
+**v1.2 · 10.29.2026** · Talk Me Out of It, site v0.7
 
 ## Goals and constraints
 
@@ -129,15 +129,18 @@ A single page, React 19 and TypeScript, built by Vite to static files. No router
 ```mermaid
 flowchart TB
   IDX["gallery/index.json"] --> App
-  App["App.tsx<br/>history API · /s/<id>"] --> Hero & Grid["GalleryGrid"] & VC["VerdictCard"] & DB["Debate"] & UTH["UnderTheHood"]
-  TR["gallery/<id>.json"] --> P1["lib/transcript.ts<br/>strict parser"] --> DB
-  TR --> P2["lib/hood.ts<br/>lenient parser"] --> UTH
-  P1 --> PB["lib/playback.ts<br/>beats and timing"] --> DB
-  P2 --> RT["lib/run-trace.ts<br/>spans from durations"] --> UTH
+  App["App.tsx<br/>history API · /s/<id>"] --> Hero & Grid["GalleryGrid"] & VC["VerdictCard"] & SR["SessionReplay"]
+  SR --> DB["Debate"] & UTH["UnderTheHood"]
+  TR["gallery/<id>.json"] --> P1["lib/transcript.ts<br/>strict parser"] --> SR
+  TR --> P2["lib/hood.ts<br/>lenient parser"] --> SR
+  P1 --> PB["lib/playback.ts<br/>beats, timing, timeline"] --> CL
+  P2 --> RT["lib/run-trace.ts<br/>spans from durations"] --> CL["lib/replay-clock.ts<br/>one clock"]
+  CL --> DB & UTH
 ```
 
-- **Progressive disclosure:** the verdict card, then the debate, then Under the hood (closed until opened; its code loads on first open).
+- **Progressive disclosure:** the verdict card, then the debate with Under the hood playing beside it, then the rest of Under the hood below them. Its code loads after the page itself.
 - **The debate** plays the transcript as a group chat: the order and the words are the transcript's, the typing time is scaled from the real seconds each turn took, and the only text the site adds is round labels and a notice for a member who sat out. Reduced motion shows everything at once.
+- **One clock for the chat and the trace:** the chat and Under the hood's run trace always play together, side by side on a desktop and with the trace pinned above the chat on a phone. `lib/replay-clock.ts` counts replay time; `buildTimeline` in `lib/playback.ts` maps it to run time, so the playhead crosses a member's turn while that member's dots show and waits while a message is read. Pause, skip and replay work from either side, and scrubbing the trace moves the chat.
 - **Under the hood** redoes the scoring arithmetic from the saved ratings and compares it with the saved score; shows every model call, tool call and retry on a time axis rebuilt from the recorded durations (exact, because the engine runs one step at a time); counts calls, retries and tokens; and shows each member's brief and system prompt from the `engine` block.
 - **Two parsers on purpose:** `transcript.ts` refuses a file it cannot play, with the field named; `hood.ts` never throws, so an odd trace can hide a detail in the panel but never break the debate above it.
 - **Sharing:** each session has an address, `/s/<id>`. The build writes `dist/s/<id>.html`, a copy of the page with that session's title, description and image tags, because link previews never run JavaScript. The preview images and the "Save image" card are drawn on a canvas in the browser with the site's own fonts and colors; the same code exports the images once into `ui/public/previews/`.

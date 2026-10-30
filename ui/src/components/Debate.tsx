@@ -1,21 +1,19 @@
 /*
   The debate: the council's saved transcript played back as a group chat.
 
-  Loads the full transcript the gallery index points to, turns it into beats (lib/playback.ts),
-  and shows them one by one: a pause, the typing dots, the message. The viewer can pause, skip
-  to the end, or replay. Someone who prefers reduced motion gets the whole transcript at once
-  with no controls, since there is nothing to play.
+  The chat shows beats (lib/playback.ts) one by one: a pause, the typing dots, the message. It
+  keeps no time of its own. The shared replay clock does (lib/replay-clock.ts), so Under the
+  hood's run trace beside it is always on the same moment. The viewer can pause, skip to the end
+  or replay, here or from the trace. Someone who prefers reduced motion gets the whole transcript
+  at once with no controls, since there is nothing to play.
 */
-import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { useReducedMotion } from "motion/react";
+import { useEffect, useRef, type ComponentType } from "react";
 import { MessagesSquare, Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { agentStyle } from "@/lib/agents";
 import { Divider, Message, Notice } from "@/components/debate/Message";
 import { TypingIndicator, TypingStatus } from "@/components/debate/TypingIndicator";
-import { useReplay } from "@/components/debate/use-replay";
-import type { GallerySession } from "@/lib/gallery";
-import { buildBeats, describeCouncil } from "@/lib/playback";
-import { loadTranscript, type Transcript } from "@/lib/transcript";
+import type { ReplayState } from "@/components/debate/use-replay";
+import type { Beat } from "@/lib/playback";
 import { cn } from "@/lib/utils";
 
 /** The card surface the verdict, the debate and Under the hood share. */
@@ -26,42 +24,6 @@ export const PANEL =
 const FOLLOW_SLACK_PX = 240;
 /** How far above the screen the end of the chat can be before the viewer has clearly moved on. */
 const FOLLOW_ABOVE_PX = 120;
-
-type Loaded = { state: "loading" } | { state: "error"; message: string } | { state: "ready"; transcript: Transcript };
-
-export function Debate({ session }: { session: GallerySession }) {
-  const [loaded, setLoaded] = useState<Loaded>({ state: "loading" });
-
-  useEffect(() => {
-    let cancelled = false;
-    loadTranscript(session.file)
-      .then((transcript) => {
-        if (!cancelled) setLoaded({ state: "ready", transcript });
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) setLoaded({ state: "error", message: error instanceof Error ? error.message : String(error) });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [session.file]);
-
-  if (loaded.state === "ready") return <DebateStage transcript={loaded.transcript} />;
-
-  return (
-    <section aria-label="The debate" className={cn(PANEL, "mt-6 p-5")}>
-      {loaded.state === "loading" ? (
-        <p className="font-mono text-sm text-muted-foreground" role="status">
-          Loading the debate…
-        </p>
-      ) : (
-        <p className="text-sm" role="alert">
-          {loaded.message}
-        </p>
-      )}
-    </section>
-  );
-}
 
 /**
   A small pill button with an icon: the debate's controls, and the share buttons.
@@ -101,41 +63,36 @@ export function ControlButton({
   );
 }
 
-function DebateStage({ transcript }: { transcript: Transcript }) {
-  const reduced = useReducedMotion() ?? false;
-  const beats = useMemo(() => buildBeats(transcript), [transcript]);
-  const { members, rounds } = useMemo(() => describeCouncil(transcript), [transcript]);
-  const { state, start, pause, resume, skip, restart } = useReplay(beats, reduced);
+export interface ReplayControls {
+  start: () => void;
+  pause: () => void;
+  resume: () => void;
+  skip: () => void;
+  restart: () => void;
+}
 
+export function DebateChat({
+  beats,
+  members,
+  rounds,
+  state,
+  controls,
+  reduced,
+}: {
+  beats: readonly Beat[];
+  members: number;
+  rounds: number;
+  state: ReplayState;
+  controls: ReplayControls;
+  reduced: boolean;
+}) {
+  const { start, pause, resume, skip, restart } = controls;
   const sectionRef = useRef<HTMLElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const following = useRef(true);
 
-  // Start when the chat's top reaches the upper 55% of the screen, so the debate is not spent (and
-  // the page does not start moving) while the viewer is still reading the verdict card. Until
-  // then the empty chat offers a "Watch the debate" button, which matters when the session sits
-  // at the bottom of the page and cannot scroll that high. (Without IntersectionObserver, start
-  // at once.)
-  useEffect(() => {
-    if (state.status !== "idle") return;
-    const section = sectionRef.current;
-    if (!section) return;
-    if (typeof IntersectionObserver === "undefined") {
-      start();
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) start();
-      },
-      { rootMargin: "0px 0px -45% 0px" },
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [state.status, start]);
-
   // Remember whether the viewer is watching the end of the chat. If they scroll up to reread, or
-  // down past it to Under the hood, new messages arrive quietly instead of pulling the page back.
+  // down past it, new messages arrive quietly instead of pulling the page back.
   useEffect(() => {
     const update = () => {
       const end = endRef.current;
@@ -155,7 +112,7 @@ function DebateStage({ transcript }: { transcript: Transcript }) {
   // Keep the newest bubble or the typing dots in view while someone is following along. "nearest"
   // scrolls only when the new end of the chat would be below the screen, and never backwards.
   // The last message arrives in the same update that makes the status "done", so that counts
-  // too. Beats shown in bulk (skip to end, reduced motion) never scroll the page.
+  // too. Beats shown in bulk (skip to end, a scrub of the trace, reduced motion) never scroll the page.
   useEffect(() => {
     const watching = state.status === "playing" || state.status === "done";
     const end = endRef.current;
@@ -166,9 +123,9 @@ function DebateStage({ transcript }: { transcript: Transcript }) {
     end.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [state.status, state.visible, state.typing, state.instant]);
 
-  const typingBeat = state.status === "playing" && state.typing ? beats[state.visible] : undefined;
+  const typingBeat = state.typing ? beats[state.visible] : undefined;
   const typingAgent = typingBeat && typingBeat.kind !== "divider" ? agentStyle(typingBeat.agent) : null;
-  const animate = !state.instant;
+  const animate = !state.instant && !reduced;
 
   // Each control swaps itself for another (Pause becomes Resume, Skip leaves Replay), and a button
   // that disappears takes keyboard focus with it. So after every control, focus lands on the first
@@ -185,7 +142,7 @@ function DebateStage({ transcript }: { transcript: Transcript }) {
   };
 
   return (
-    <section ref={sectionRef} aria-labelledby="debate-title" className={cn(PANEL, "mt-6")}>
+    <section ref={sectionRef} aria-labelledby="debate-title" className={cn(PANEL, "scroll-mt-6")}>
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-border px-4 py-4 sm:px-5">
         <div className="flex flex-col gap-1">
           <h2
@@ -257,7 +214,7 @@ function DebateStage({ transcript }: { transcript: Transcript }) {
             <TypingIndicator agent={typingAgent} />
           </div>
         ) : null}
-        <TypingStatus label={typingAgent ? `${typingAgent.name} is typing` : ""} />
+        <TypingStatus label={typingAgent && state.status === "playing" ? `${typingAgent.name} is typing` : ""} />
         <div ref={endRef} aria-hidden="true" className="scroll-mb-6" />
       </div>
     </section>
