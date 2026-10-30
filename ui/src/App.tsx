@@ -4,6 +4,7 @@ import { ArrowUp } from "lucide-react";
 import { Debate } from "@/components/Debate";
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { Hero } from "@/components/Hero";
+import { HowItWorks } from "@/components/HowItWorks";
 import { UnderTheHood } from "@/components/UnderTheHood";
 import { VerdictCard } from "@/components/VerdictCard";
 import { ShareBar } from "@/components/ShareBar";
@@ -88,6 +89,8 @@ export default function App() {
       <Hero />
 
       <main className="flex-1">
+        <HowItWorks />
+
         <section
           id="gallery"
           aria-labelledby="gallery-title"

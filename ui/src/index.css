@@ -32,15 +32,17 @@
   --ring: #e78a53;
   --radius: 0.75rem;
 
-  --verdict-buy: #4ade80;
-  --verdict-wait: #fbbf24;
-  --verdict-skip: #f87171;
+  /* Matte (Dan, 10.29.2026): about half the saturation of the first set, hues spread evenly so
+     each pair stays apart, every one above 6:1 contrast on --background. */
+  --verdict-buy: #8dcd8e;
+  --verdict-wait: #eabc6e;
+  --verdict-skip: #d87a6b;
 
-  --agent-analyst: #5fb3b3;
-  --agent-future: #a78bfa;
-  --agent-guardian: #f472b6;
-  --agent-hunter: #60a5fa;
-  --agent-judge: #e7dfd6;
+  --agent-analyst: #75bdbc;
+  --agent-future: #bea8e2;
+  --agent-guardian: #d68fae;
+  --agent-hunter: #7ca0d5;
+  --agent-judge: #dbd3c9;
 
   /* The warm light on the gallery cards (the pulled Feature Grid card expects these two names). */
   --warm: var(--primary);
@@ -145,6 +147,99 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/*
+  The pipeline's connectors (HowItWorks). Each is a hairline; once the pipeline has entered, a
+  short light runs along each one in turn, at the second its --flow-at names in a 5.5 second
+  loop, so the lights follow a purchase stage by stage. The light travels in its first 8 percent
+  of the loop (about half a second) and waits out the rest. Off under reduced motion.
+*/
+.wire {
+  position: absolute;
+  background: color-mix(in oklab, var(--foreground) 18%, transparent);
+  --wire-light: color-mix(in oklab, var(--primary) 75%, var(--foreground-strong));
+}
+
+.wire::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 0;
+}
+
+.wire[data-axis="x"]::after {
+  inset-block: -1px;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--wire-light), transparent);
+}
+
+.wire[data-axis="y"]::after {
+  inset-inline: -1px;
+  top: 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, var(--wire-light), transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-flowing] .wire[data-axis="x"]::after {
+    animation: wire-flow-x 5.5s linear var(--flow-at, 0s) infinite;
+  }
+  [data-flowing] .wire[data-axis="x"][data-reverse]::after {
+    animation-name: wire-flow-x-back;
+  }
+  [data-flowing] .wire[data-axis="y"]::after {
+    animation: wire-flow-y 5.5s linear var(--flow-at, 0s) infinite;
+  }
+}
+
+@keyframes wire-flow-x {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  1.5%,
+  6.5% {
+    opacity: 1;
+  }
+  8%,
+  100% {
+    transform: translateX(150%);
+    opacity: 0;
+  }
+}
+
+@keyframes wire-flow-x-back {
+  0% {
+    transform: translateX(150%);
+    opacity: 0;
+  }
+  1.5%,
+  6.5% {
+    opacity: 1;
+  }
+  8%,
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes wire-flow-y {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  1.5%,
+  6.5% {
+    opacity: 1;
+  }
+  8%,
+  100% {
+    transform: translateY(150%);
+    opacity: 0;
+  }
 }
 
 /* Keyboard users always see where they are. */
