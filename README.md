@@ -56,6 +56,14 @@
 
 ## How a verdict is reached
 
+The landing page walks a visitor through it in six steps:
+
+<p align="center">
+  <img src="docs/screenshots/how-it-works.jpg" width="80%" alt="The How it works section of the landing page: you describe the purchase, a quick check, four council members each rating it, Python scoring it, the Judge explaining the ruling, and your verdict, above the line that the model judges and the code calculates">
+</p>
+
+The exact flow in the engine, including the polite decline and the tiebreak round:
+
 ```mermaid
 flowchart TB
   P["Purchase<br/>item · price · why · want 1 to 10 · current device"] --> I{"Intake check<br/>a tech gadget?"}

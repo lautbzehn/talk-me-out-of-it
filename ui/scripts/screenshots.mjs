@@ -3,6 +3,7 @@
 //
 //   npm run preview --prefix ui            (or any server with the built site)
 //   node ui/scripts/screenshots.mjs http://localhost:4173
+//   node ui/scripts/screenshots.mjs https://talk.icarianforge.com      (the live site works too)
 //
 // Writes PNGs into docs/screenshots/. Each shot names a page, a viewport, what to do on the page
 // first, and the box to capture (page coordinates, in CSS pixels). Reduced motion is emulated so
@@ -29,6 +30,20 @@ const SHOTS = [
     path: "/",
     viewport: { width: 1600, height: 1000, mobile: false },
     prepare: `({ x: 0, y: 0, width: 1600, height: 1000 })`,
+  },
+  {
+    // The whole How it works section: 1024 px wide, as tall as it is. It has 24px of padding above
+    // and 80px below, so cutting 56px from the height leaves an even 24px all round.
+    name: "how-it-works",
+    path: "/",
+    viewport: { width: 1600, height: 1000, mobile: false },
+    prepare: `(async () => {
+      const el = document.querySelector('#how-it-works');
+      el.scrollIntoView();
+      await new Promise((r) => setTimeout(r, 800));
+      const r = el.getBoundingClientRect();
+      return { x: 288, y: r.top + window.scrollY, width: 1024, height: Math.ceil(r.height) - 56 };
+    })()`,
   },
   {
     name: "debate",
