@@ -75,12 +75,12 @@ function colors() {
     strong: token("--foreground-strong", "#f2efea"),
     border: token("--border", "#262626"),
     primary: token("--primary", "#e78a53"),
-    future: token("--agent-future", "#a78bfa"),
-    analyst: token("--agent-analyst", "#5fb3b3"),
+    future: token("--agent-future", "#bea8e2"),
+    analyst: token("--agent-analyst", "#75bdbc"),
   };
 }
 
-const verdictColor = (v: Verdict) => token(`--verdict-${v}`, "#fbbf24");
+const verdictColor = (v: Verdict) => token(`--verdict-${v}`, "#eabc6e");
 
 /** The page's fonts may not have been needed yet at these weights; wait so the canvas never falls back. */
 async function loadFonts(): Promise<void> {
