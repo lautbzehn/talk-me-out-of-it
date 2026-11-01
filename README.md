@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://talk.icarianforge.com"><b>Watch a debate</b></a> ·
-  <a href="docs/architecture_v1.1_10.29.2026.md">Architecture</a> ·
+  <a href="docs/architecture_v1.2_10.29.2026.md">Architecture</a> ·
   <a href="docs/adr">Decision records</a> ·
   <a href="PROGRESS.md">Build notes</a> ·
   <a href="CHANGELOG.md">Changelog</a>
@@ -79,7 +79,7 @@ flowchart TB
   J --> T[("Transcript<br/>sessions/*.json")]
 ```
 
-The score is the plain average of every rating in each member's final turn (one item, cost of waiting, is rated but not counted: the model gives it about 2 whatever the purchase). 5.5 and up is Buy, below 4.5 is Skip, between is Wait 30 days. Then two rails: Buy needs at least one member leaning Buy, Skip needs at least one leaning Skip; otherwise the verdict holds at Wait, and the transcript records which rule held it. Full detail in **[docs/architecture](docs/architecture_v1.1_10.29.2026.md)** and [ADR 0001](docs/adr/0001-the-model-judges-the-code-calculates_v1.0_10.29.2026.md).
+The score is the plain average of every rating in each member's final turn (one item, cost of waiting, is rated but not counted: the model gives it about 2 whatever the purchase). 5.5 and up is Buy, below 4.5 is Skip, between is Wait 30 days. Then two rails: Buy needs at least one member leaning Buy, Skip needs at least one leaning Skip; otherwise the verdict holds at Wait, and the transcript records which rule held it. Full detail in **[docs/architecture](docs/architecture_v1.2_10.29.2026.md)** and [ADR 0001](docs/adr/0001-the-model-judges-the-code-calculates_v1.0_10.29.2026.md).
 
 ## Does it work?
 
@@ -118,7 +118,7 @@ flowchart LR
   E["evals/<br/>15 scenarios · runner · replay"] --> O
 ```
 
-The engine and the site never share code or a server. Python writes each session as JSON; the site reads the JSON and nothing else, so what you see on the page is exactly what the council produced. Full detail in **[docs/architecture](docs/architecture_v1.1_10.29.2026.md)**.
+The engine and the site never share code or a server. Python writes each session as JSON; the site reads the JSON and nothing else, so what you see on the page is exactly what the council produced. Full detail in **[docs/architecture](docs/architecture_v1.2_10.29.2026.md)**.
 </details>
 
 <details>

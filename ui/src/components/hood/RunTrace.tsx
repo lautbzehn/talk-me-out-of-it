@@ -8,16 +8,20 @@
   time drives everything, and the animation loop writes a CSS variable per row instead of
   re-rendering React each frame. Changed: our colors (each member's bar is its own color, a
   rejected attempt is striped rather than red, since red means Skip here), our icons, no token
-  counter or looping, a fixed replay length (the whole run in about six seconds, whatever its
-  real length), and choosing a row opens a details panel instead of only seeking.
+  counter or looping, and no clock of its own: the replay clock the chat beside it runs on
+  (lib/replay-clock.ts) moves the playhead, so a member's turn fills while their dots show in the
+  chat, and scrubbing here moves the chat too. Choosing a row opens a details panel as well as
+  seeking. The rows scroll inside the trace, which keeps the step now running in view.
 */
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { CircleAlert, Cpu, Layers, Pause, Play, ScanSearch, Wrench, type LucideIcon } from "lucide-react";
 import { agentStyle } from "@/lib/agents";
+import type { ReplayClock, ReplayStatus } from "@/lib/replay-clock";
 import { formatSpanTime, type TraceSpan } from "@/lib/run-trace";
 import { cn } from "@/lib/utils";
 
-const REPLAY_MS = 6000;
+/** After the viewer scrolls the steps themselves, leave them where they put them for this long. */
+const HANDS_OFF_MS = 4000;
 const TICK_STEPS_MS = [10_000, 15_000, 30_000, 60_000, 120_000, 300_000];
 
 type RowState = "queued" | "running" | "done" | "error";
@@ -46,10 +50,16 @@ const KIND_ICON: Record<Exclude<TraceSpan["kind"], "agent">, LucideIcon> = {
 
 const STATUS_WORD: Record<RowState, string> = { queued: "queued", running: "running", done: "succeeded", error: "failed" };
 
+const RUN_WORD: Record<ReplayStatus, string> = { idle: "Ready", playing: "Replaying", paused: "Paused", done: "Completed" };
+
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 
+/** A step has begun once the playhead is past its start. The next turn starts the instant the
+    last one ends, so while the chat pauses on a message, the next member is still queued. */
+const begun = (span: LaidSpan, t: number) => t > span.start || (span.dur === 0 && t >= span.start);
+
 /** m:ss, for the clock and the ruler (runs are minutes long). */
-function clock(ms: number): string {
+function clockLabel(ms: number): string {
   const s = Math.round(ms / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
@@ -195,6 +205,7 @@ export function RunTrace({
   spans,
   total,
   model,
+  clock,
   reduced,
   selectedId,
   onSelect,
@@ -202,6 +213,7 @@ export function RunTrace({
   spans: TraceSpan[];
   total: number;
   model: string;
+  clock: ReplayClock;
   reduced: boolean;
   selectedId: string | null;
   onSelect: (span: TraceSpan) => void;
@@ -209,14 +221,10 @@ export function RunTrace({
   const rootRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const clockRef = useRef<HTMLSpanElement>(null);
-  const statusRef = useRef<HTMLSpanElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const rowsRef = useRef<(RowHandle | null)[]>([]);
-  const timeRef = useRef(reduced ? total : 0);
-  const playingRef = useRef(false);
-  const seekRef = useRef<(ms: number) => void>(() => {});
-  const runRef = useRef<() => void>(() => {});
-  const haltRef = useRef<() => void>(() => {});
-  const [playing, setPlaying] = useState(false);
+  const [status, setStatus] = useState<ReplayStatus>(clock.status);
+  const playing = status === "playing";
 
   const rows = useMemo(() => layout(spans), [spans]);
   const ticks = useMemo(() => {
@@ -231,32 +239,32 @@ export function RunTrace({
     rowsRef.current[index] = handle;
   }, []);
 
-  // The playhead loop. Each frame it moves the playhead and writes, per row, how full the bar is
+  // The playhead. Each tick of the shared clock moves it and writes, per row, how full the bar is
   // (--p), the state word and the elapsed time: DOM writes only, no React render.
   useLayoutEffect(() => {
     const root = rootRef.current;
+    const box = scrollRef.current;
     if (!root) return;
     rowsRef.current.length = rows.length;
-    const speed = total / REPLAY_MS;
-    let raf = 0;
-    let last = 0;
-    let onScreen = true;
-    let lastRun = "";
+    let lastStatus = "";
+    let current = -1;
+    let handsOffUntil = 0;
 
-    // `announce` is true when the playhead was moved on purpose (a key, a click, the first paint),
-    // false for the animation's own frames.
-    const paint = (announce = false) => {
-      const t = timeRef.current;
+    const paint = () => {
+      const t = clock.run;
       root.style.setProperty("--t", (t / total).toFixed(5));
-      for (const row of rowsRef.current) {
-        if (!row) continue;
+      let latest = -1;
+      rowsRef.current.forEach((row, i) => {
+        if (!row) return;
         const { span } = row;
-        const p = span.dur > 0 ? clamp((t - span.start) / span.dur, 0, 1) : t >= span.start ? 1 : 0;
+        const started = begun(span, t);
+        if (started) latest = i;
+        const p = span.dur > 0 ? clamp((t - span.start) / span.dur, 0, 1) : started ? 1 : 0;
         if (p !== row.lastP) {
           row.el.style.setProperty("--p", p.toFixed(4));
           row.lastP = p;
         }
-        const state: RowState = t < span.start ? "queued" : p < 1 ? "running" : span.status === "error" ? "error" : "done";
+        const state: RowState = !started ? "queued" : p < 1 ? "running" : span.status === "error" ? "error" : "done";
         if (state !== row.lastState) {
           row.el.dataset.state = state;
           if (row.status) row.status.textContent = STATUS_WORD[state];
@@ -267,103 +275,55 @@ export function RunTrace({
           row.dur.textContent = dur;
           row.lastDur = dur;
         }
+      });
+
+      // Keep the step that began last in view inside the trace's own scroll box (never the page),
+      // unless the viewer has just scrolled the steps themselves.
+      const row = rowsRef.current[latest]?.el;
+      if (latest !== current && box && row && performance.now() > handsOffUntil) {
+        const top = row.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
+        if (top < box.scrollTop || top + row.offsetHeight > box.scrollTop + box.clientHeight) {
+          const smooth = !clock.jumped && !reduced;
+          box.scrollTo({ top: Math.max(0, top - box.clientHeight / 3), behavior: smooth ? "smooth" : "auto" });
+        }
       }
-      if (clockRef.current) clockRef.current.textContent = `${clock(t)} / ${clock(total)}`;
-      const runState = t >= total ? "complete" : "running";
-      if (runState !== lastRun) {
-        root.dataset.run = runState;
-        if (statusRef.current) statusRef.current.textContent = runState === "complete" ? "Completed" : "Replaying";
-        lastRun = runState;
+      current = latest;
+
+      if (clockRef.current) clockRef.current.textContent = `${clockLabel(t)} / ${clockLabel(total)}`;
+      if (clock.status !== lastStatus) {
+        root.dataset.run = clock.status === "playing" ? "running" : clock.status;
+        lastStatus = clock.status;
       }
-      // The slider's value is only updated when the viewer moved it (or the replay is not
-      // playing), never ten times a second during play. During play it used to skip every update,
-      // so arrow keys pressed while the replay ran changed the playhead and told a screen reader
-      // nothing.
-      const rail = playingRef.current && !announce ? null : railRef.current;
+      // The slider's value is only updated when the playhead jumped (a key, a drag, a chosen step)
+      // or the replay is not playing, never every frame during play. Arrow keys pressed while the
+      // replay runs still tell a screen reader where they landed.
+      const rail = clock.status === "playing" && !clock.jumped ? null : railRef.current;
       if (rail) {
         rail.setAttribute("aria-valuenow", String(Math.round(t / 1000)));
-        rail.setAttribute("aria-valuetext", `${clock(t)} of ${clock(total)}`);
+        rail.setAttribute("aria-valuetext", `${clockLabel(t)} of ${clockLabel(total)}`);
       }
+      setStatus(clock.status);
     };
 
-    const frame = (now: number) => {
-      raf = 0;
-      const dt = Math.min(now - (last || now), 100); // no leap after a hidden tab or a long frame
-      last = now;
-      timeRef.current += dt * speed;
-      if (timeRef.current >= total) {
-        timeRef.current = total;
-        playingRef.current = false;
-        setPlaying(false);
-      }
-      paint();
-      if (playingRef.current) raf = requestAnimationFrame(frame);
+    const handsOff = () => {
+      handsOffUntil = performance.now() + HANDS_OFF_MS;
     };
-    const start = () => {
-      if (raf || !playingRef.current || !onScreen || document.hidden) return;
-      last = 0;
-      raf = requestAnimationFrame(frame);
-    };
-    const halt = () => {
-      cancelAnimationFrame(raf);
-      raf = 0;
-    };
-    runRef.current = start;
-    haltRef.current = halt;
-    seekRef.current = (ms: number) => {
-      timeRef.current = clamp(ms, 0, total);
-      last = 0;
-      paint(true);
-    };
-
-    if (reduced) {
-      timeRef.current = total;
-      playingRef.current = false;
-      setPlaying(false);
-    } else {
-      playingRef.current = true;
-      setPlaying(true);
-    }
-    paint(true);
-
-    const onVisibility = () => (document.hidden ? halt() : start());
-    const observer =
-      typeof IntersectionObserver === "undefined"
-        ? null
-        : new IntersectionObserver(([entry]) => {
-            onScreen = entry?.isIntersecting ?? true;
-            if (onScreen) start();
-            else halt();
-          });
-    observer?.observe(root);
-    document.addEventListener("visibilitychange", onVisibility);
-    start();
-
+    box?.addEventListener("wheel", handsOff, { passive: true });
+    box?.addEventListener("touchstart", handsOff, { passive: true });
+    paint();
+    const unsubscribe = clock.subscribe(paint);
     return () => {
-      halt();
-      observer?.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
-      runRef.current = () => {};
-      haltRef.current = () => {};
-      seekRef.current = () => {};
+      unsubscribe();
+      box?.removeEventListener("wheel", handsOff);
+      box?.removeEventListener("touchstart", handsOff);
     };
-  }, [rows, total, reduced]);
-
-  const togglePlay = () => {
-    const next = !playingRef.current;
-    if (next && timeRef.current >= total) timeRef.current = 0;
-    playingRef.current = next;
-    setPlaying(next);
-    seekRef.current(timeRef.current);
-    if (next) runRef.current();
-    else haltRef.current();
-  };
+  }, [rows, total, clock, reduced]);
 
   const scrubFrom = (clientX: number, el: HTMLElement) => {
     const inset = Number(el.dataset.inset ?? 0);
     const rect = el.getBoundingClientRect();
     const width = rect.width - inset * 2;
-    if (width > 0) seekRef.current(((clientX - rect.left - inset) / width) * total);
+    if (width > 0) clock.seekRun(clamp((clientX - rect.left - inset) / width, 0, 1) * total);
   };
   const onScrubDown = (e: PointerEvent<HTMLElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -378,29 +338,23 @@ export function RunTrace({
   const onRailKeyDown = (e: KeyboardEvent) => {
     const step = total / 50;
     const delta: Record<string, number> = { ArrowRight: step, ArrowUp: step, ArrowLeft: -step, ArrowDown: -step, PageUp: step * 10, PageDown: -step * 10 };
-    if (e.key === "Home") seekRef.current(0);
-    else if (e.key === "End") seekRef.current(total);
-    else if (e.key in delta) seekRef.current(timeRef.current + (delta[e.key] ?? 0));
+    if (e.key === "Home") clock.seekRun(0);
+    else if (e.key === "End") clock.seekRun(total);
+    else if (e.key in delta) clock.seekRun(clamp(clock.run + (delta[e.key] ?? 0), 0, total));
     else return;
     e.preventDefault();
   };
 
-  // Choosing a row moves the playhead to where that step began and shows its details.
+  // Choosing a row pauses the replay, so the bars and the chat stop moving under the viewer, and
+  // moves both to where that step finished: the chat then shows what the step led to.
   const selectRow = useCallback(
     (span: LaidSpan) => {
-      seekRef.current(span.start);
+      clock.pause();
+      clock.seekRun(span.end);
       onSelect(span);
     },
-    [onSelect],
+    [clock, onSelect],
   );
-
-  // Pause the replay while the viewer inspects a step, so the bars stop moving under them.
-  useEffect(() => {
-    if (selectedId === null || !playingRef.current) return;
-    playingRef.current = false;
-    setPlaying(false);
-    haltRef.current();
-  }, [selectedId]);
 
   // The ruler, gridlines, playhead and scrub surface share one box, lined up with the bars.
   const trackBox = "absolute left-[calc(var(--gutter)+0.75rem)] right-[calc(var(--meta)+0.75rem)]";
@@ -408,27 +362,27 @@ export function RunTrace({
   return (
     <div
       ref={rootRef}
-      className="group/trace @container/trace w-full overflow-hidden rounded-card border border-border bg-background/40"
+      className="group/trace @container/trace flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-card border border-border bg-background/40"
     >
-      <div className="flex items-center gap-2.5 border-b border-border px-3 py-2.5">
+      <div className="flex shrink-0 items-center gap-2.5 border-b border-border px-3 py-2.5">
         <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-muted-foreground/40 transition-colors duration-300 group-data-[run=running]/trace:bg-primary" />
         <span className="font-mono text-[13px] font-medium leading-none text-foreground">This run</span>
         <span className="hidden truncate text-xs leading-none text-muted-foreground @sm/trace:inline">
           {model} · {rows.length} steps
         </span>
-        <span ref={statusRef} className="ml-auto shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[11px] leading-4 text-muted-foreground">
-          Completed
+        <span className="ml-auto shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[11px] leading-4 text-muted-foreground">
+          {RUN_WORD[status]}
         </span>
       </div>
 
       {/* The name and result columns answer to the trace's own width, not the screen's. On a phone
           the names get the room (short names, a tighter indent) and the bars make do. */}
-      <div className="relative [--gutter:144px] [--indent:8px] [--meta:3.25rem] @xs/trace:[--gutter:156px] @md/trace:[--gutter:176px] @md/trace:[--indent:12px] @md/trace:[--meta:9rem]">
+      <div className="relative flex min-h-0 flex-1 flex-col [--gutter:144px] [--indent:8px] [--meta:3.25rem] @xs/trace:[--gutter:156px] @md/trace:[--gutter:176px] @md/trace:[--indent:12px] @md/trace:[--meta:9rem]">
         <div
           onPointerDown={onScrubDown}
           onPointerMove={onScrubMove}
           onPointerUp={onScrubUp}
-          className="relative h-7 cursor-ew-resize touch-none select-none border-b border-border @max-sm/trace:hidden"
+          className="relative h-7 shrink-0 cursor-ew-resize touch-none select-none border-b border-border @max-sm/trace:hidden"
         >
           <div className={cn(trackBox, "inset-y-0")}>
             {ticks.map((t) => (
@@ -437,41 +391,43 @@ export function RunTrace({
                 className="absolute top-2 -translate-x-1/2 font-mono text-[10px] leading-none text-muted-foreground tabular-nums"
                 style={{ left: `${(t / total) * 100}%` }}
               >
-                {clock(t)}
+                {clockLabel(t)}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="relative py-1">
-          <div aria-hidden="true" className={cn(trackBox, "inset-y-0 @max-sm/trace:hidden")}>
-            {ticks.map((t) => (
-              <span key={t} className="absolute inset-y-0 w-px bg-border/60" style={{ left: `${(t / total) * 100}%` }} />
-            ))}
-          </div>
+        <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+          <div className="relative py-1">
+            <div aria-hidden="true" className={cn(trackBox, "inset-y-0 @max-sm/trace:hidden")}>
+              {ticks.map((t) => (
+                <span key={t} className="absolute inset-y-0 w-px bg-border/60" style={{ left: `${(t / total) * 100}%` }} />
+              ))}
+            </div>
 
-          <ol aria-label="Steps in this run" className="relative">
-            {rows.map((span, i) => (
-              <li key={span.id}>
-                <TraceRow span={span} index={i} total={total} selected={selectedId === span.id} onSelect={selectRow} register={registerRow} />
-              </li>
-            ))}
-          </ol>
+            <ol aria-label="Steps in this run" className="relative">
+              {rows.map((span, i) => (
+                <li key={span.id}>
+                  <TraceRow span={span} index={i} total={total} selected={selectedId === span.id} onSelect={selectRow} register={registerRow} />
+                </li>
+              ))}
+            </ol>
 
-          <div aria-hidden="true" className={cn(trackBox, "pointer-events-none inset-y-0")}>
-            <div className="relative h-full w-full" style={{ transform: "translateX(calc(var(--t,0) * 100%))" }}>
-              <span className="absolute inset-y-0 w-px bg-primary/70" />
-              <span className="absolute top-0 size-1.5 -translate-x-[2.5px] rotate-45 bg-primary" />
+            <div aria-hidden="true" className={cn(trackBox, "pointer-events-none inset-y-0")}>
+              <div className="relative h-full w-full" style={{ transform: "translateX(calc(var(--t,0) * 100%))" }}>
+                <span className="absolute inset-y-0 w-px bg-primary/70" />
+                <span className="absolute top-0 size-1.5 -translate-x-[2.5px] rotate-45 bg-primary" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 border-t border-border px-3 py-2">
+      <div className="flex shrink-0 items-center gap-3 border-t border-border px-3 py-2">
         <button
           type="button"
-          onClick={togglePlay}
-          aria-label={playing ? "Pause the replay" : "Replay the run"}
+          onClick={() => clock.toggle()}
+          aria-label={playing ? "Pause the replay" : status === "done" ? "Replay from the start" : "Play the replay"}
           className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform duration-150 before:absolute before:-inset-1 before:content-[''] active:scale-[0.97]"
         >
           {playing ? <Pause aria-hidden="true" className="size-3.5 fill-current" /> : <Play aria-hidden="true" className="size-3.5 translate-x-px fill-current" />}
@@ -483,7 +439,7 @@ export function RunTrace({
           aria-label="Playhead"
           aria-valuemin={0}
           aria-valuemax={Math.round(total / 1000)}
-          aria-valuenow={Math.round((reduced ? total : 0) / 1000)}
+          aria-valuenow={Math.round(clock.run / 1000)}
           data-inset="6"
           onPointerDown={onScrubDown}
           onPointerMove={onScrubMove}

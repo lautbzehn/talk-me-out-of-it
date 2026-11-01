@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { ArrowUp } from "lucide-react";
-import { Debate } from "@/components/Debate";
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
-import { UnderTheHood } from "@/components/UnderTheHood";
+import { SessionReplay } from "@/components/SessionReplay";
 import { VerdictCard } from "@/components/VerdictCard";
 import { ShareBar } from "@/components/ShareBar";
 import { loadGalleryIndex, type GalleryIndex } from "@/lib/gallery";
@@ -140,12 +139,13 @@ export default function App() {
             ref={sessionRef}
             tabIndex={-1}
             aria-label={`The verdict and debate for ${selected.item}`}
-            className="mx-auto w-full max-w-xl scroll-mt-6 px-4 pb-10 focus:outline-none sm:px-6"
+            className="mx-auto w-full max-w-6xl scroll-mt-6 px-4 pb-10 focus:outline-none sm:px-6"
           >
-            <VerdictCard key={selected.id} session={selected} />
-            <ShareBar key={`share-${selected.id}`} session={selected} />
-            {selected.kind === "council" ? <Debate key={`debate-${selected.id}`} session={selected} /> : null}
-            <UnderTheHood key={`hood-${selected.id}`} session={selected} />
+            <div className="mx-auto w-full max-w-xl">
+              <VerdictCard key={selected.id} session={selected} />
+              <ShareBar key={`share-${selected.id}`} session={selected} />
+            </div>
+            <SessionReplay key={`replay-${selected.id}`} session={selected} />
             <a
               href="#gallery"
               className="mt-4.5 inline-flex items-center gap-1.5 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"

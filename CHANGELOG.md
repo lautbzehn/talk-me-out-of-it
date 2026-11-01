@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- UI v0.7 (10.29.2026, branch `ui/sync-replay`, Dan's ask): the chat and Under the hood always play together, side by side and in sync. One replay clock drives both, so the trace's playhead crosses each member's turn while that member's dots show; pause, skip, replay, scrubbing and choosing a step all move both. Under the hood is no longer a closed panel: the trace sits beside the chat on a desktop (sticky, its steps following the one running) and is pinned above it on a phone, and the scoring math, the numbers and the brief are always open below. More electricity in the How it works diagram: wires between the four members carry sparks both ways during the debate (23 lit wires on a desktop, up from 17), and every spark glows and trails a second pulse. The README screenshot and audit scripts follow the new layout; the architecture doc is v1.2. Not yet: the README screenshots and the portfolio's images. PROGRESS.md v1.46
 - Release notes cut (10.29.2026, Dan's go): v0.5 and v0.6 below are dated releases, so the changelog matches the footer of the live site. PROGRESS.md v1.45
 
 ## v0.6 · 10.29.2026

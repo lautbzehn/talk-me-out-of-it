@@ -46,25 +46,27 @@ const SHOTS = [
     })()`,
   },
   {
+    // The debate and Under the hood's run trace, side by side as they play. The session section is
+    // 1152 px wide at this size (max-w-6xl), so x 224 is its left edge.
     name: "debate",
     path: `/s/${SESSION}`,
     viewport: { width: 1600, height: 1000, mobile: false },
     prepare: `(() => {
-      const r = document.querySelector('#session').getBoundingClientRect();
+      const r = document.querySelector('#debate-title').closest('section').getBoundingClientRect();
       const top = r.top + window.scrollY - 24;
-      return { x: 300, y: top, width: 1000, height: 1000 };
+      return { x: 224, y: top, width: 1152, height: 1000 };
     })()`,
   },
   {
+    // The rest of Under the hood, below them: the scoring math, the run in numbers, the brief.
     name: "under-the-hood",
     path: `/s/${SESSION}`,
     viewport: { width: 1600, height: 1000, mobile: false },
     prepare: `(async () => {
-      document.querySelector('#hood-title button').click();
-      await new Promise((r) => setTimeout(r, 1500));
-      const r = document.querySelector('section[aria-labelledby=hood-run]').getBoundingClientRect();
+      await new Promise((r) => setTimeout(r, 1000));
+      const r = document.querySelector('section[aria-labelledby=hood-more-name]').getBoundingClientRect();
       const top = r.top + window.scrollY - 24;
-      return { x: 300, y: top, width: 1000, height: 1000 };
+      return { x: 224, y: top, width: 1152, height: 1000 };
     })()`,
   },
   {

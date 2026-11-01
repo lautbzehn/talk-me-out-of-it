@@ -151,16 +151,20 @@ body {
 
 /*
   The pipeline's connectors (HowItWorks). Each is a hairline; once the pipeline has entered, a
-  short light runs along each one in turn, at the second its --flow-at names in a 5.5 second
-  loop, so the lights follow a purchase stage by stage. The light travels in its first 8 percent
-  of the loop (about half a second) and waits out the rest. Off under reduced motion.
+  spark runs along each one in turn, at the second its --flow-at names in a 5.5 second loop, so
+  the sparks follow a purchase stage by stage, and cross between the members while they debate.
+  Each spark is a bright, glowing head (::after) with a fainter second pulse a beat behind it
+  (::before). It travels in the first 8 percent of the loop (about half a second) and waits out
+  the rest. Off under reduced motion.
 */
 .wire {
   position: absolute;
   background: color-mix(in oklab, var(--foreground) 18%, transparent);
   --wire-light: color-mix(in oklab, var(--primary) 75%, var(--foreground-strong));
+  --wire-trail: color-mix(in oklab, var(--wire-light) 55%, transparent);
 }
 
+.wire::before,
 .wire::after {
   content: "";
   position: absolute;
@@ -168,29 +172,62 @@ body {
   opacity: 0;
 }
 
+.wire::after {
+  filter: drop-shadow(0 0 4px var(--wire-light));
+}
+
+.wire[data-axis="x"]::before,
 .wire[data-axis="x"]::after {
-  inset-block: -1px;
   left: 0;
   width: 40%;
   background: linear-gradient(90deg, transparent, var(--wire-light), transparent);
 }
 
+.wire[data-axis="x"]::after {
+  inset-block: -1.5px;
+}
+
+.wire[data-axis="x"]::before {
+  inset-block: 0;
+  background: linear-gradient(90deg, transparent, var(--wire-trail), transparent);
+}
+
+.wire[data-axis="y"]::before,
 .wire[data-axis="y"]::after {
-  inset-inline: -1px;
   top: 0;
   height: 40%;
   background: linear-gradient(180deg, transparent, var(--wire-light), transparent);
+}
+
+.wire[data-axis="y"]::after {
+  inset-inline: -1.5px;
+}
+
+.wire[data-axis="y"]::before {
+  inset-inline: 0;
+  background: linear-gradient(180deg, transparent, var(--wire-trail), transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   [data-flowing] .wire[data-axis="x"]::after {
     animation: wire-flow-x 5.5s linear var(--flow-at, 0s) infinite;
   }
+  [data-flowing] .wire[data-axis="x"]::before {
+    animation: wire-flow-x 5.5s linear calc(var(--flow-at, 0s) + 0.14s) infinite;
+  }
+  [data-flowing] .wire[data-axis="x"][data-reverse]::before,
   [data-flowing] .wire[data-axis="x"][data-reverse]::after {
     animation-name: wire-flow-x-back;
   }
   [data-flowing] .wire[data-axis="y"]::after {
     animation: wire-flow-y 5.5s linear var(--flow-at, 0s) infinite;
+  }
+  [data-flowing] .wire[data-axis="y"]::before {
+    animation: wire-flow-y 5.5s linear calc(var(--flow-at, 0s) + 0.14s) infinite;
+  }
+  [data-flowing] .wire[data-axis="y"][data-reverse]::before,
+  [data-flowing] .wire[data-axis="y"][data-reverse]::after {
+    animation-name: wire-flow-y-back;
   }
 }
 
@@ -238,6 +275,22 @@ body {
   8%,
   100% {
     transform: translateY(150%);
+    opacity: 0;
+  }
+}
+
+@keyframes wire-flow-y-back {
+  0% {
+    transform: translateY(150%);
+    opacity: 0;
+  }
+  1.5%,
+  6.5% {
+    opacity: 1;
+  }
+  8%,
+  100% {
+    transform: translateY(0);
     opacity: 0;
   }
 }
